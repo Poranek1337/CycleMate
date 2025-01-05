@@ -1,17 +1,23 @@
 //
 //  PageIndicator.swift
 //  CycleMate
-//
-//  Created by Poranek on 11/12/2024.
+//  dev.Poranek
 //
 
 import SwiftUI
 
+/// A view that displays a page indicator for onboarding or other paginated content.
 struct PageIndicator: View {
+    /// The current page index.
     let currentPage: Int
+    
+    /// The total number of pages.
     let totalPages: Int
+    
+    /// The color for the current page indicator.
     let darkGray: Color
     
+    // MARK: - Body
     var body: some View {
         HStack(spacing: 8) {
             ForEach(0..<totalPages, id: \.self) { index in
@@ -34,4 +40,7 @@ struct PageIndicator: View {
     }
 }
 
-
+// Preview
+#Preview {
+    PageIndicator(currentPage: 1, totalPages: 5, darkGray: .gray)
+}

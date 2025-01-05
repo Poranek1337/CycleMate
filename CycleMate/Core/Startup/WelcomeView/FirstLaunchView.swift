@@ -1,12 +1,28 @@
+//
+//  FirstLaunchView.swift
+//  CycleMate
+//  dev.Poranek
+//
+
 import SwiftUI
 
+/// A view that handles the first launch experience with onboarding slides and authentication.
 struct FirstLaunchView: View {
-    // View model for managing state and logic
+    // MARK: - Properties
+    
+    /// The view model for managing state and logic.
     @StateObject private var viewModel = FirstLaunchViewModel()
+    
+    /// A flag indicating if the authentication card should be shown.
     @State private var showAuthCard = false
+    
+    /// A flag indicating if the main tab view should be shown.
     @State private var shouldShowMainTab = false
+    
+    /// The environment object for authentication view model.
     @EnvironmentObject private var authViewModel: AuthViewModel
     
+    // MARK: - Body
     var body: some View {
         Group {
             if shouldShowMainTab {
@@ -22,6 +38,7 @@ struct FirstLaunchView: View {
         }
     }
     
+    /// The content for the onboarding slides.
     private var onboardingContent: some View {
         ZStack {
             // Base content
@@ -126,6 +143,7 @@ struct FirstLaunchView: View {
     }
 }
 
+// Preview
 #Preview {
     FirstLaunchView()
         .environmentObject(AuthViewModel())

@@ -1,15 +1,34 @@
-// Your imports remain the same
+//
+//  AuthButton.swift
+//  CycleMate
+//  dev.Poranek
+//
+
 import SwiftUI
 
+/// A customizable authentication button with loading state.
 struct AuthButton: View {
-    // Properties remain the same
+    /// The title of the button.
     let title: String
+    
+    /// The system image name to display in the button.
     let systemImage: String?
+    
+    /// The style of the button.
     let style: ButtonStyle
+    
+    /// The action to perform when the button is tapped.
     let action: () async throws -> Void
+    
+    /// The loading state of the button.
     @State private var isLoading = false
     
-    // Init remains the same
+    /// Initializes a new authentication button.
+    /// - Parameters:
+    ///   - title: The title of the button.
+    ///   - systemImage: The system image name to display in the button.
+    ///   - style: The style of the button.
+    ///   - action: The action to perform when the button is tapped.
     init(
         title: String,
         systemImage: String? = nil,
@@ -67,12 +86,9 @@ struct AuthButton: View {
         .disabled(isLoading)
     }
     
+    /// The style of the button.
     enum ButtonStyle {
         case primary
         case outlined
     }
 }
-
-// Remove if extension as it's now in ViewModifiers.swift
-
-// End of file. No additional code.

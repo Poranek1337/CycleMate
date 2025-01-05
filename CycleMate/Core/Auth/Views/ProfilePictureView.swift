@@ -1,41 +1,58 @@
 //
 //  ProfilePictureView.swift
 //  CycleMate
-//
-//  Created by Poranek on 15/12/2024.
+//  dev.Poranek
 //
 
 import SwiftUI
 
+/// A view that allows users to add or update their profile picture.
 struct ProfilePictureView: View {
     // MARK: - Properties
+    
+    /// The environment dismiss action.
     @Environment(\.dismiss) private var dismiss
+    
+    /// The view model for authentication.
     @ObservedObject private var viewModel: AuthViewModel
+    
+    /// The image picker model.
     @StateObject private var imagePickerModel = ImagePickerModel()
+    
+    /// A flag indicating if the content should be animated.
     @State private var animateContent = false
+    
+    /// A flag indicating if the photo options should be shown.
     @State private var showPhotoOptions = false
+    
+    /// The offset for the view.
     @State private var offset: CGFloat = UIScreen.main.bounds.height
+    
+    /// A flag indicating if the main view should be shown.
     @State private var showMainView = false
     
-    // Add computed property for button text
+    /// A computed property to check if an image has been selected.
     private var hasSelectedImage: Bool {
         viewModel.userProfileImage != nil
     }
     
-    // Background opacity computation
+    /// The background opacity based on the offset.
     private var backgroundOpacity: Double {
         let progress = 1 - (offset / UIScreen.main.bounds.height)
         return Double(max(0, min(0.3, progress * 0.3)))
     }
     
     // MARK: - Initialization
+    
+    /// Initializes a new instance of `ProfilePictureView`.
+    /// - Parameter viewModel: The view model for authentication.
     init(viewModel: AuthViewModel) {
         print(" ProfilePictureView initialized with viewModel")
         self._viewModel = ObservedObject(wrappedValue: viewModel)
     }
     
+    // MARK: - Body
     var body: some View {
-        // Add navigation stack for programmatic navigation
         NavigationView {
             GeometryReader { geometry in
                 ZStack(alignment: .bottom) {
@@ -94,7 +111,7 @@ struct ProfilePictureView: View {
                         
                         Spacer()
                         
-                        // Modified bottom buttons with logging
+                        // Bottom buttons
                         VStack(spacing: 15) {
                             Button {
                                 print(" Choose photo button tapped")
@@ -273,6 +290,8 @@ struct ProfilePictureView: View {
     }
     
     // MARK: - Helper Methods
+    
+    /// Dismisses the photo options with animation.
     private func dismissPhotoOptions() {
         print(" Dismissing photo options")
         withAnimation(.spring()) {
@@ -284,7 +303,7 @@ struct ProfilePictureView: View {
     }
 }
 
-// Add preview
+// Preview remains the same
 #Preview {
     ProfilePictureView(viewModel: AuthViewModel())
 }

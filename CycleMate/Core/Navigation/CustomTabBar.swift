@@ -1,9 +1,18 @@
+//
+//  CustomTabBar.swift
+//  CycleMate
+//  dev.Poranek
+//
+
 import SwiftUI
 
-// Tab Model remains the same
+// MARK: - Tab Model
+
+/// An enumeration representing the different tabs in the app.
 enum Tab: String, CaseIterable {
     case home, map, calendar
     
+    /// The icon associated with each tab.
     var icon: String {
         switch self {
         case .home: return "house.fill"
@@ -14,20 +23,34 @@ enum Tab: String, CaseIterable {
 }
 
 // MARK: - Custom Tab Bar View
+
+/// A custom tab bar view that supports both portrait and landscape orientations.
 struct CustomTabBar: View {
+    /// The currently selected tab.
     @Binding var selectedTab: Tab
+    
+    /// A flag indicating if the tab bar is being dragged.
+    @Binding var isDragging: Bool
+    
+    /// The current color scheme (light or dark mode).
     @Environment(\.colorScheme) private var colorScheme
+    
+    /// The current device orientation.
     let deviceOrientation: UIDeviceOrientation
     
-    // Properties remain the same
+    // Properties for styling
+    
+    /// The color for the selected tab.
     private var selectedColor: Color {
         colorScheme == .dark ? .white : .black
     }
     
+    /// The color for unselected tabs.
     private var unselectedColor: Color {
         .gray.opacity(0.5)
     }
     
+    /// A flag indicating if the device is in landscape orientation.
     private var isLandscape: Bool {
         deviceOrientation.isLandscape
     }
@@ -36,14 +59,15 @@ struct CustomTabBar: View {
         if isLandscape {
             // Vertical layout for landscape
             GeometryReader { geometry in
-                let tabWidth: CGFloat = 52 // Width of the tab bar with padding
-                let edgeDistance: CGFloat = tabWidth / 2 // Distance from edge to center of tab bar
+                let tabWidth: CGFloat = 52
+                let edgeDistance: CGFloat = tabWidth / 2
                 
                 VStack(spacing: 15) {
                     ForEach(Tab.allCases, id: \.self) { tab in
                         Button {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            if !isDragging {
                                 selectedTab = tab
+                                print("Selected tab: \(tab)")
                             }
                         } label: {
                             ZStack {
@@ -56,6 +80,8 @@ struct CustomTabBar: View {
                                     .foregroundColor(selectedTab == tab ? selectedColor : unselectedColor)
                             }
                         }
+                        .buttonStyle(BorderlessButtonStyle())
+                        .contentShape(Rectangle())
                     }
                 }
                 .padding(.vertical, 8)
@@ -65,16 +91,16 @@ struct CustomTabBar: View {
                         .fill(Material.ultraThinMaterial)
                 )
                 .frame(width: tabWidth)
-                // Use exact positioning from edges
                 .position(
                     x: deviceOrientation == .landscapeLeft ?
-                        geometry.size.width - edgeDistance : // Right edge for landscapeLeft
+                        geometry.size.width - edgeDistance :
                         deviceOrientation == .landscapeRight ?
-                            edgeDistance : // Left edge for landscapeRight
-                            edgeDistance, // Default edge for other orientations
+                            edgeDistance :
+                            edgeDistance,
                     y: geometry.size.height / 2
                 )
             }
+            .zIndex(2)
         } else {
             // Portrait layout
             VStack {
@@ -89,8 +115,9 @@ struct CustomTabBar: View {
                     HStack(spacing: 0) {
                         ForEach(Tab.allCases, id: \.self) { tab in
                             Button {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                if !isDragging {
                                     selectedTab = tab
+                                    print("Selected tab: \(tab)")
                                 }
                             } label: {
                                 Image(systemName: tab.icon)
@@ -98,6 +125,7 @@ struct CustomTabBar: View {
                                     .foregroundColor(selectedTab == tab ? selectedColor : unselectedColor)
                                     .frame(maxWidth: .infinity)
                             }
+                            .buttonStyle(BorderlessButtonStyle())
                         }
                     }
                 }
@@ -108,7 +136,9 @@ struct CustomTabBar: View {
         }
     }
     
-    // selectedTabOffset remains the same
+    // Helper computed property for tab offset
+    
+    /// The offset for the selected tab indicator.
     private var selectedTabOffset: CGFloat {
         let tabWidth = UIScreen.main.bounds.width / CGFloat(Tab.allCases.count)
         if let index = Tab.allCases.firstIndex(of: selectedTab) {
@@ -118,8 +148,13 @@ struct CustomTabBar: View {
     }
 }
 
+// Preview
 #Preview {
-    CustomTabBar(selectedTab: .constant(.home), deviceOrientation: .portrait)
+    CustomTabBar(
+        selectedTab: .constant(.home),
+        isDragging: .constant(false),
+        deviceOrientation: .portrait
+    )
 }
 
-// End of file. No additional code.
+// End of file

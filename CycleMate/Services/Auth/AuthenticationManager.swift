@@ -3,6 +3,7 @@
 //  CycleMate
 //
 
+// Your imports remain the same
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
@@ -10,16 +11,12 @@ import FirebaseStorage
 import GoogleSignIn
 import SwiftUI
 
-
-
-
-// MARK: - Properties and Types
+/// Manages authentication and user sessions.
 @MainActor
 class AuthenticationManager: ObservableObject {
-    // Singleton instance
+    // MARK: - Properties
     static let shared = AuthenticationManager()
     
-    // Published properties
     @Published var currentUser: AuthUser?
     @Published var isAuthenticated = false
     @Published var needsProfileCompletion = false
@@ -28,15 +25,18 @@ class AuthenticationManager: ObservableObject {
     private let db = Firestore.firestore()
     private let storage = Storage.storage().reference()
     
+    // Add flag to prevent duplicate loading
+    private var isLoadingUser = false
+    
     // MARK: - Initialization
     private init() {
         print("📱 AuthenticationManager initialized")
         configureFirestore()
         setupAuthStateListener()
-        checkAuthenticationState()
+        // Remove initial checkAuthenticationState call
     }
     
-    // Configure Firestore for offline persistence
+    /// Configures Firestore for offline persistence.
     private func configureFirestore() {
         let settings = FirestoreSettings()
         settings.isPersistenceEnabled = true
@@ -45,13 +45,19 @@ class AuthenticationManager: ObservableObject {
     }
     
     // MARK: - Auth State Management
+    /// Sets up the authentication state listener.
     private func setupAuthStateListener() {
         print("🔄 Setting up auth state listener")
         Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
             if let user = user {
-                print("👤 User session exists: \(user.uid)")
+                print("✅ Found user session for ID: \(user.uid)")
                 Task { [weak self] in
-                    try? await self?.loadExistingUser(firebaseId: user.uid)
+                    guard let self = self else { return }
+                    if !self.isLoadingUser {
+                        self.isLoadingUser = true
+                        try? await self.loadExistingUser(firebaseId: user.uid)
+                        self.isLoadingUser = false
+                    }
                 }
             } else {
                 print("❌ No user session")
@@ -60,6 +66,7 @@ class AuthenticationManager: ObservableObject {
         }
     }
     
+    /// Clears the user state.
     private func clearUserState() {
         print("🧹 Clearing user state")
         Task { @MainActor in
@@ -73,17 +80,8 @@ class AuthenticationManager: ObservableObject {
         }
     }
     
-    // MARK: - Authentication State
-    private func checkAuthenticationState() {
-        if let firebaseUser = Auth.auth().currentUser {
-            print("🔄 Restoring existing session for user: \(firebaseUser.uid)")
-            Task {
-                try? await loadExistingUser(firebaseId: firebaseUser.uid)
-            }
-        }
-    }
-    
     // MARK: - Google Authentication
+    // Rest of Google authentication methods remain the same
     func signInWithGoogle() async throws {
         print("🔵 Starting Google Sign In process")
         
@@ -161,8 +159,9 @@ class AuthenticationManager: ObservableObject {
     }
     
     // MARK: - Profile Management
+    /// Loads an existing user from Firestore.
+    /// - Parameter firebaseId: The Firebase user ID.
     private func loadExistingUser(firebaseId: String) async throws {
-        // Enable offline data persistence for this query
         let document = try await db.collection("users").document(firebaseId)
             .getDocument(source: .default)
         
@@ -176,6 +175,8 @@ class AuthenticationManager: ObservableObject {
               let isProfileCompleted = data["isProfileCompleted"] as? Bool else {
             throw AuthError.userNotFound
         }
+        
+        print("👤 User found: \(firstName) \(lastName)")
         
         let user = AuthUser(
             id: firebaseId,
@@ -192,8 +193,10 @@ class AuthenticationManager: ObservableObject {
         self.currentUser = user
         self.isAuthenticated = true
         self.needsProfileCompletion = false
+        print("✅ Session authenticated for: \(firstName) \(lastName)")
     }
     
+    // Rest of profile management methods remain the same
     func updateUserProfile(firstName: String, lastName: String, dateOfBirth: Date) async throws {
         print("👤 Updating user profile")
         
@@ -291,3 +294,5 @@ class AuthenticationManager: ObservableObject {
         }
     }
 }
+
+// End of file. No additional code.

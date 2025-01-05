@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// An enumeration representing authentication errors.
 enum AuthError: Error {
     case signInFailed
     case signUpFailed
@@ -18,6 +19,7 @@ enum AuthError: Error {
     case imageProcessingFailed
     case imageUploadFailed
     
+    /// A description of the error.
     var description: String {
         switch self {
         case .signInFailed: return "Failed to sign in. Please try again."
@@ -34,4 +36,3 @@ enum AuthError: Error {
 }
 
 // End of file. No additional code.
-

@@ -5,6 +5,7 @@
 
 import SwiftUI
 
+/// A view that displays the splash screen and handles navigation to the appropriate view based on the authentication state.
 struct SplashScreenView: View {
     // MARK: - Properties
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -72,6 +73,8 @@ struct SplashScreenView: View {
 }
 
 // MARK: - Shape
+
+/// A custom shape used in the splash screen.
 struct ArcShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()

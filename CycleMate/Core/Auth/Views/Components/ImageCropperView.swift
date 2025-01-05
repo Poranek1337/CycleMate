@@ -1,21 +1,34 @@
 //
 //  ImageCropperView.swift
 //  CycleMate
-//
-//  Created by Poranek on 15/12/2024.
+//  dev.Poranek
 //
 
-// Your imports remain the same
 import SwiftUI
 
+/// A view that allows users to crop an image within a circular frame.
 struct ImageCropperView: View {
     // MARK: - Properties
+    
+    /// The environment dismiss action.
     @Environment(\.dismiss) private var dismiss
+    
+    /// The scale factor for the image.
     @State private var scale: CGFloat = 1
+    
+    /// The last scale factor for the image.
     @State private var lastScale: CGFloat = 1
+    
+    /// The offset for the image.
     @State private var offset: CGSize = .zero
+    
+    /// The last offset for the image.
     @State private var lastOffset: CGSize = .zero
+    
+    /// The image to be cropped.
     let image: UIImage
+    
+    /// The action to perform when the image is cropped.
     let onCrop: (UIImage) -> Void
     
     // MARK: - View Body
@@ -150,6 +163,12 @@ struct ImageCropperView: View {
     }
     
     // MARK: - Helper Methods
+    
+    /// Calculates the minimum scale factor to ensure the image fills the circle.
+    /// - Parameters:
+    ///   - image: The image to be scaled.
+    ///   - geometry: The geometry proxy for the image.
+    /// - Returns: The minimum scale factor.
     private func calculateMinimumScale(for image: UIImage, in geometry: GeometryProxy) -> CGFloat {
         let circleSize = min(geometry.size.width, geometry.size.height)
         let imageSize = image.size
@@ -158,6 +177,11 @@ struct ImageCropperView: View {
         return max(widthRatio, heightRatio) * 1.1 // Add 10% to ensure complete coverage
     }
     
+    /// Limits the offset to ensure the image stays within the bounds of the circle.
+    /// - Parameters:
+    ///   - offset: The current offset.
+    ///   - geometry: The geometry proxy for the image.
+    /// - Returns: The limited offset.
     private func limitOffset(_ offset: CGSize, in geometry: GeometryProxy) -> CGSize {
         let circleSize = min(geometry.size.width, geometry.size.height)
         let scaledImageSize = CGSize(
@@ -176,6 +200,8 @@ struct ImageCropperView: View {
         )
     }
     
+    /// Crops the image to fit within the circular frame.
+    /// - Parameter geometry: The geometry proxy for the view.
     private func cropImage(geometry: GeometryProxy) {
         let renderer = ImageRenderer(content:
             Image(uiImage: image)
@@ -202,5 +228,3 @@ struct ImageCropperView: View {
 #Preview {
     ImageCropperView(image: UIImage(systemName: "person.fill")!) { _ in }
 }
-
-// End of file. No additional code.

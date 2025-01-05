@@ -1,6 +1,7 @@
 //
 //  AuthenticationView.swift
 //  CycleMate
+//  dev.Poranek
 //
 
 import SwiftUI
@@ -8,16 +9,29 @@ import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 
+/// A view that handles user authentication.
 struct AuthenticationView: View {
     // MARK: - Properties
+    
+    /// The view model for authentication.
     @StateObject private var viewModel = AuthViewModel()
+    
+    /// A binding to determine if the view is presented.
     @Binding var isPresented: Bool
+    
+    /// The action to perform on successful authentication.
     var onSuccessfulAuth: () -> Void
+    
+    /// The offset for the view.
     @State private var offset: CGFloat = UIScreen.main.bounds.height
+    
+    /// A flag indicating if the view is being dragged.
     @State private var isDragging = false
+    
+    /// A flag indicating if the main tab view should be shown.
     @State private var showMainTabView = false
     
-    // Background opacity computation
+    /// The background opacity based on the offset.
     private var backgroundOpacity: Double {
         let progress = 1 - (offset / UIScreen.main.bounds.height)
         return Double(max(0, min(0.3, progress * 0.3)))
@@ -178,6 +192,8 @@ struct AuthenticationView: View {
     }
     
     // MARK: - Helper Methods
+    
+    /// Dismisses the card view with animation.
     private func dismissCard() {
         withAnimation(.spring()) {
             offset = UIScreen.main.bounds.height
@@ -189,10 +205,17 @@ struct AuthenticationView: View {
 }
 
 // MARK: - Helper Views
+
+/// A view representing a horizontal line.
 struct Line: View {
     var body: some View {
         Rectangle()
             .fill(Color.gray.opacity(0.3))
             .frame(height: 1)
     }
+}
+
+// Preview remains the same
+#Preview {
+    AuthenticationView(isPresented: .constant(true), onSuccessfulAuth: {})
 }

@@ -1,16 +1,21 @@
 //
 //  CycleMateApp.swift
 //  CycleMate
+//  dev.Poranek
 //
 
-// Import required frameworks
 import SwiftUI
 import FirebaseCore
 import Firebase
 import FirebaseAuth
 
-// AppDelegate for Firebase configuration
+/// AppDelegate for Firebase configuration
 class AppDelegate: NSObject, UIApplicationDelegate {
+    /// Configures Firebase and handles first launch logic.
+    /// - Parameters:
+    ///   - application: The singleton app object.
+    ///   - launchOptions: A dictionary indicating the reason the app was launched (if any).
+    /// - Returns: A boolean indicating whether the app successfully handled the launch request.
     func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         print("🚀 Application launching")
@@ -46,10 +51,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct CycleMateApp: App {
-    // Register app delegate for Firebase setup
+    /// Registers the app delegate for Firebase setup.
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
-    // Initialize authentication view model
+    /// Initializes the authentication view model.
     @StateObject private var authViewModel = AuthViewModel()
     
     var body: some Scene {
@@ -59,5 +64,3 @@ struct CycleMateApp: App {
         }
     }
 }
-
-// End of file. No additional code.

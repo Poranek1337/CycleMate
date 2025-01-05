@@ -1,16 +1,41 @@
+//
+//  UserDataFormView.swift
+//  CycleMate
+//  dev.Poranek
+//
+
 import SwiftUI
 
+/// A view that handles user data form for profile setup.
 struct UserDataFormView: View {
-    // Properties
+    // MARK: - Properties
+    
+    /// The environment dismiss action.
     @Environment(\.dismiss) private var dismiss
+    
+    /// The view model for authentication.
     @ObservedObject private var viewModel: AuthViewModel
+    
+    /// A flag indicating if the content should be animated.
     @State private var animateContent = false
+    
+    /// A flag indicating if the date picker should be shown.
     @State private var showDatePicker = false
+    
+    /// A flag indicating if the date has been selected.
     @State private var dateSelected = false
+    
+    /// A flag indicating if the terms have been accepted.
     @State private var termsAccepted = false
+    
+    /// A flag indicating if the newsletter has been accepted.
     @State private var newsletterAccepted = false
+    
+    /// A flag indicating if validation errors should be shown.
     @State private var showValidationErrors = false
-    @State private var showProfilePicture = false // Add navigation state
+    
+    /// A flag indicating if the profile picture view should be shown.
+    @State private var showProfilePicture = false
     
     // Validation states
     private var isFirstNameValid: Bool { !viewModel.firstName.isEmpty }
@@ -19,11 +44,15 @@ struct UserDataFormView: View {
     private var isTermsAccepted: Bool { termsAccepted }
     private var isFormValid: Bool { isFirstNameValid && isLastNameValid && isDateValid && isTermsAccepted }
     
-    // Add initializer
+    // MARK: - Initialization
+    
+    /// Initializes a new instance of `UserDataFormView`.
+    /// - Parameter viewModel: The view model for authentication.
     init(viewModel: AuthViewModel) {
         self._viewModel = ObservedObject(wrappedValue: viewModel)
     }
     
+    // MARK: - Body
     var body: some View {
         ZStack(alignment: .center) {
             VStack(spacing: 0) {
@@ -294,7 +323,6 @@ struct UserDataFormView: View {
                 animateContent = true
             }
         }
-        // Add navigation to ProfilePictureView
         .fullScreenCover(isPresented: $showProfilePicture) {
             ProfilePictureView(viewModel: viewModel)
                 .interactiveDismissDisabled(true)
