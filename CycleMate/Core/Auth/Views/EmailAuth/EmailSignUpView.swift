@@ -323,12 +323,36 @@ struct EmailSignUpView: View {
             Task {
                 verificationStatus = .verifying
                 showVerificationPopup = true
-                await AuthUtils.handleContinueButton(isFormValid: isFormValid, email: email, password: password, viewModel: viewModel)
+                await viewModel.sendVerificationEmail(email: email, password: password)
+                await checkVerification()
             }
         } else {
             withAnimation {
                 showValidationErrors = true
             }
+        }
+    }
+    
+    private func checkVerification() async {
+        // Check for 5 minutes (60 * 5 seconds)
+        for _ in 0..<60 {
+            try? await Task.sleep(nanoseconds: 5_000_000_000) // 5 seconds
+            if let user = Auth.auth().currentUser {
+                try? await user.reload()
+                if user.isEmailVerified {
+                    // Update verification status
+                    await MainActor.run {
+                        verificationStatus = .success
+                    }
+                    return
+                }
+            }
+        }
+        // If verification timeout occurs
+        await MainActor.run {
+            viewModel.errorMessage = "Email verification timeout. Please try again."
+            viewModel.showError = true
+            showVerificationPopup = false
         }
     }
     
@@ -470,7 +494,10 @@ struct EmailSignUpView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 60))
                     .foregroundColor(.green)
-                    .transition(.scale.combined(with: .opacity))
+                    .transition(.asymmetric(
+                        insertion: .scale.combined(with: .opacity),
+                        removal: .scale.combined(with: .opacity)
+                    ))
             } else {
                 Image(systemName: "envelope.circle.fill")
                     .font(.system(size: 60))
@@ -478,6 +505,7 @@ struct EmailSignUpView: View {
         }
         .foregroundColor(Color("second"))
         .padding()
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: verificationStatus)
     }
     
     private var verificationActionButton: some View {
