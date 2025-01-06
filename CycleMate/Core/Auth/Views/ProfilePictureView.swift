@@ -4,48 +4,31 @@
 //  dev.Poranek
 //
 
+// Your imports remain the same
 import SwiftUI
 
 /// A view that allows users to add or update their profile picture.
 struct ProfilePictureView: View {
-    // MARK: - Properties
-    
-    /// The environment dismiss action.
+    // MARK: - Properties remain the same
     @Environment(\.dismiss) private var dismiss
-    
-    /// The view model for authentication.
     @ObservedObject private var viewModel: AuthViewModel
-    
-    /// The image picker model.
     @StateObject private var imagePickerModel = ImagePickerModel()
-    
-    /// A flag indicating if the content should be animated.
     @State private var animateContent = false
-    
-    /// A flag indicating if the photo options should be shown.
     @State private var showPhotoOptions = false
-    
-    /// The offset for the view.
     @State private var offset: CGFloat = UIScreen.main.bounds.height
-    
-    /// A flag indicating if the main view should be shown.
     @State private var showMainView = false
     
-    /// A computed property to check if an image has been selected.
+    // MARK: - Computed properties remain the same
     private var hasSelectedImage: Bool {
         viewModel.userProfileImage != nil
     }
     
-    /// The background opacity based on the offset.
     private var backgroundOpacity: Double {
         let progress = 1 - (offset / UIScreen.main.bounds.height)
         return Double(max(0, min(0.3, progress * 0.3)))
     }
     
-    // MARK: - Initialization
-    
-    /// Initializes a new instance of `ProfilePictureView`.
-    /// - Parameter viewModel: The view model for authentication.
+    // MARK: - Initialization remains the same
     init(viewModel: AuthViewModel) {
         print(" ProfilePictureView initialized with viewModel")
         self._viewModel = ObservedObject(wrappedValue: viewModel)
@@ -56,9 +39,9 @@ struct ProfilePictureView: View {
         NavigationView {
             GeometryReader { geometry in
                 ZStack(alignment: .bottom) {
-                    // Main content
+                    // Main content section remains the same
                     VStack(spacing: 0) {
-                        // Header section
+                        // Header section remains the same
                         HStack(alignment: .top) {
                             Button(action: {
                                 print(" User tapped back button")
@@ -74,7 +57,7 @@ struct ProfilePictureView: View {
                         .padding(.horizontal)
                         .padding(.top)
                         
-                        // Title and description
+                        // Title and description section remains the same
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Add profile picture ")
                                 .font(.system(size: 32, weight: .bold))
@@ -89,7 +72,7 @@ struct ProfilePictureView: View {
                         .opacity(animateContent ? 1 : 0)
                         .offset(y: animateContent ? 0 : 20)
                         
-                        // Profile image view
+                        // Profile image circle remains the same
                         ZStack {
                             Circle()
                                 .fill(Color.gray.opacity(0.1))
@@ -111,12 +94,12 @@ struct ProfilePictureView: View {
                         
                         Spacer()
                         
-                        // Bottom buttons
+                        // Bottom buttons remain the same
                         VStack(spacing: 15) {
                             Button {
                                 print(" Choose photo button tapped")
+                                showPhotoOptions = true
                                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                    showPhotoOptions = true
                                     offset = 0
                                 }
                             } label: {
@@ -132,22 +115,18 @@ struct ProfilePictureView: View {
                             
                             Button {
                                 print(" Continue/Maybe later button tapped")
-                                if hasSelectedImage {
-                                    print(" Uploading profile image...")
-                                    Task {
+                                Task {
+                                    if hasSelectedImage {
+                                        print(" Uploading profile image...")
                                         await viewModel.updateProfileImage(image: viewModel.userProfileImage!)
                                         print(" Profile image upload completed")
                                         print(" Error state: \(viewModel.showError)")
-                                        if !viewModel.showError {
-                                            print(" Setting showMainView to true")
-                                            dismiss()
-                                            showMainView = true
-                                        }
                                     }
-                                } else {
-                                    print(" Skipping profile image, navigating to main view")
-                                    dismiss()
-                                    showMainView = true
+                                    
+                                    if !viewModel.showError {
+                                        print(" Setting showMainView to true")
+                                        showMainView = true
+                                    }
                                 }
                             } label: {
                                 Text(hasSelectedImage ? "Continue" : "Maybe later")
@@ -164,10 +143,9 @@ struct ProfilePictureView: View {
                         }
                         .padding()
                         .background(Color(.systemBackground))
-                        .padding(.bottom, 20)
                     }
                     
-                    // Photo selection card
+                    // Updated photo selection card
                     if showPhotoOptions {
                         Color.black
                             .opacity(backgroundOpacity)
@@ -177,13 +155,16 @@ struct ProfilePictureView: View {
                             }
                         
                         VStack(spacing: 0) {
+                            // Handle indicator
                             Rectangle()
                                 .fill(Color.gray.opacity(0.15))
                                 .frame(width: 50, height: 5)
                                 .cornerRadius(2.5)
-                                .padding(.top, 12)
+                                .padding(.top, 8)
+                                .padding(.bottom, 15)
                             
-                            VStack(spacing: 15) {
+                            // Photo options buttons
+                            VStack(spacing: 12) {
                                 Button {
                                     print(" User tapped Take Photo")
                                     imagePickerModel.sourceType = .camera
@@ -221,13 +202,19 @@ struct ProfilePictureView: View {
                                 }
                             }
                             .padding(.horizontal, 25)
-                            .padding(.vertical, 20)
+                            .padding(.bottom, 30)
                         }
+                        .background(
+                            Color(.systemBackground)
+                                .clipShape(
+                                    RoundedRectangle(cornerRadius: 25)
+                                )
+                        )
+                        .frame(height: 200)
                         .frame(maxWidth: .infinity)
-                        .background(Color(.systemBackground))
-                        .cornerRadius(25, corners: [.topLeft, .topRight])
+                        .transition(.move(edge: .bottom))
                         .offset(y: offset)
-                        .ignoresSafeArea(.container, edges: .bottom)
+                        .position(x: geometry.size.width / 2, y: geometry.size.height + (offset - 55))
                         .gesture(
                             DragGesture()
                                 .onChanged { value in
@@ -237,10 +224,10 @@ struct ProfilePictureView: View {
                                     }
                                 }
                                 .onEnded { value in
-                                    if value.translation.height > 100 {
+                                    if value.translation.height > 50 {
                                         dismissPhotoOptions()
                                     } else {
-                                        withAnimation(.spring()) {
+                                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                                             offset = 0
                                         }
                                     }
@@ -248,6 +235,7 @@ struct ProfilePictureView: View {
                         )
                     }
                 }
+                // Sheet modifiers remain the same
                 .sheet(isPresented: $imagePickerModel.showImagePicker) {
                     ImagePickerView(
                         sourceType: imagePickerModel.sourceType,
@@ -289,12 +277,10 @@ struct ProfilePictureView: View {
         .navigationViewStyle(.stack)
     }
     
-    // MARK: - Helper Methods
-    
-    /// Dismisses the photo options with animation.
+    // MARK: - Helper Methods remain the same
     private func dismissPhotoOptions() {
         print(" Dismissing photo options")
-        withAnimation(.spring()) {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
             offset = UIScreen.main.bounds.height
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -303,7 +289,6 @@ struct ProfilePictureView: View {
     }
 }
 
-// Preview remains the same
 #Preview {
     ProfilePictureView(viewModel: AuthViewModel())
 }

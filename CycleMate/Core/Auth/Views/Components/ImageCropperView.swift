@@ -6,45 +6,27 @@
 
 import SwiftUI
 
-/// A view that allows users to crop an image within a circular frame.
 struct ImageCropperView: View {
     // MARK: - Properties
-    
-    /// The environment dismiss action.
     @Environment(\.dismiss) private var dismiss
-    
-    /// The scale factor for the image.
-    @State private var scale: CGFloat = 1
-    
-    /// The last scale factor for the image.
-    @State private var lastScale: CGFloat = 1
-    
-    /// The offset for the image.
     @State private var offset: CGSize = .zero
-    
-    /// The last offset for the image.
     @State private var lastOffset: CGSize = .zero
-    
-    /// The image to be cropped.
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var isDragging = false
     let image: UIImage
-    
-    /// The action to perform when the image is cropped.
     let onCrop: (UIImage) -> Void
     
     // MARK: - View Body
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Background color
-                Color.black
-                    .ignoresSafeArea()
+                Color.black.ignoresSafeArea()
                 
-                // Main content
                 VStack {
+                    // Header with close button
                     HStack {
-                        Button(action: {
-                            dismiss()
-                        }) {
+                        Button(action: { dismiss() }) {
                             Image(systemName: "xmark")
                                 .font(.title2)
                                 .foregroundColor(.white)
@@ -58,57 +40,63 @@ struct ImageCropperView: View {
                     
                     Spacer()
                     
-                    // Centered image with crop overlay
+                    // Image cropper
                     ZStack {
-                        GeometryReader { imageGeometry in
+                        let circleSize = min(geometry.size.width, geometry.size.height) * 0.8
+                        
+                        GeometryReader { _ in
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(
-                                    width: min(geometry.size.width, geometry.size.height) * 0.8,
-                                    height: min(geometry.size.width, geometry.size.height) * 0.8
-                                )
-                                .scaleEffect(max(scale, calculateMinimumScale(for: image, in: imageGeometry)))
-                                .offset(limitOffset(offset, in: imageGeometry))
+                                .frame(width: circleSize, height: circleSize)
+                                .scaleEffect(scale)
+                                .offset(offset)
                                 .gesture(
-                                    SimultaneousGesture(
-                                        DragGesture()
-                                            .onChanged { value in
-                                                let newOffset = CGSize(
-                                                    width: lastOffset.width + value.translation.width,
-                                                    height: lastOffset.height + value.translation.height
-                                                )
-                                                offset = limitOffset(newOffset, in: imageGeometry)
-                                            }
-                                            .onEnded { _ in
+                                    DragGesture()
+                                        .onChanged { value in
+                                            isDragging = true
+                                            let newOffset = CGSize(
+                                                width: lastOffset.width + value.translation.width,
+                                                height: lastOffset.height + value.translation.height
+                                            )
+                                            // Allow free movement during drag
+                                            offset = newOffset
+                                        }
+                                        .onEnded { _ in
+                                            isDragging = false
+                                            lastOffset = offset
+                                            // Animate back to bounds with spring effect
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                                offset = limitOffset(offset, circleSize: circleSize)
                                                 lastOffset = offset
-                                            },
-                                        MagnificationGesture()
-                                            .onChanged { value in
-                                                let minScale = calculateMinimumScale(for: image, in: imageGeometry)
-                                                let newScale = lastScale * value
-                                                scale = max(newScale, minScale)
                                             }
-                                            .onEnded { _ in
-                                                let minScale = calculateMinimumScale(for: image, in: imageGeometry)
-                                                scale = max(scale, minScale)
-                                                lastScale = scale
+                                        }
+                                )
+                                .gesture(
+                                    MagnificationGesture()
+                                        .onChanged { value in
+                                            let delta = value / lastScale
+                                            lastScale = value
+                                            
+                                            // Allow free scaling during gesture
+                                            scale *= delta
+                                        }
+                                        .onEnded { _ in
+                                            lastScale = 1.0
+                                            // Animate to acceptable scale with spring effect
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                                scale = max(1.0, scale)
+                                                offset = limitOffset(offset, circleSize: circleSize)
                                             }
-                                    )
+                                        }
                                 )
                         }
-                        .frame(
-                            width: min(geometry.size.width, geometry.size.height) * 0.8,
-                            height: min(geometry.size.width, geometry.size.height) * 0.8
-                        )
+                        .frame(width: circleSize, height: circleSize)
                         .clipShape(Circle())
                         
                         Circle()
                             .stroke(Color.white, lineWidth: 2)
-                            .frame(
-                                width: min(geometry.size.width, geometry.size.height) * 0.8,
-                                height: min(geometry.size.width, geometry.size.height) * 0.8
-                            )
+                            .frame(width: circleSize, height: circleSize)
                     }
                     
                     Spacer()
@@ -148,45 +136,16 @@ struct ImageCropperView: View {
                 }
             }
         }
-        .onAppear {
-            // Set initial scale to ensure image always fills the circle
-            DispatchQueue.main.async {
-                let screenWidth = UIScreen.main.bounds.width
-                let circleSize = screenWidth * 0.8
-                let imageSize = image.size
-                let widthRatio = circleSize / imageSize.width
-                let heightRatio = circleSize / imageSize.height
-                scale = max(widthRatio, heightRatio) * 1.1 // Add 10% to ensure complete coverage
-                lastScale = scale
-            }
-        }
     }
     
     // MARK: - Helper Methods
     
-    /// Calculates the minimum scale factor to ensure the image fills the circle.
-    /// - Parameters:
-    ///   - image: The image to be scaled.
-    ///   - geometry: The geometry proxy for the image.
-    /// - Returns: The minimum scale factor.
-    private func calculateMinimumScale(for image: UIImage, in geometry: GeometryProxy) -> CGFloat {
-        let circleSize = min(geometry.size.width, geometry.size.height)
+    private func limitOffset(_ offset: CGSize, circleSize: CGFloat) -> CGSize {
         let imageSize = image.size
-        let widthRatio = circleSize / imageSize.width
-        let heightRatio = circleSize / imageSize.height
-        return max(widthRatio, heightRatio) * 1.1 // Add 10% to ensure complete coverage
-    }
-    
-    /// Limits the offset to ensure the image stays within the bounds of the circle.
-    /// - Parameters:
-    ///   - offset: The current offset.
-    ///   - geometry: The geometry proxy for the image.
-    /// - Returns: The limited offset.
-    private func limitOffset(_ offset: CGSize, in geometry: GeometryProxy) -> CGSize {
-        let circleSize = min(geometry.size.width, geometry.size.height)
+        let baseScale = max(circleSize / imageSize.width, circleSize / imageSize.height)
         let scaledImageSize = CGSize(
-            width: image.size.width * scale,
-            height: image.size.height * scale
+            width: imageSize.width * baseScale * scale,
+            height: imageSize.height * baseScale * scale
         )
         
         let maxOffset = CGSize(
@@ -200,17 +159,13 @@ struct ImageCropperView: View {
         )
     }
     
-    /// Crops the image to fit within the circular frame.
-    /// - Parameter geometry: The geometry proxy for the view.
     private func cropImage(geometry: GeometryProxy) {
+        let circleSize = min(geometry.size.width, geometry.size.height) * 0.8
         let renderer = ImageRenderer(content:
             Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
-                .frame(
-                    width: min(geometry.size.width, geometry.size.height) * 0.8,
-                    height: min(geometry.size.width, geometry.size.height) * 0.8
-                )
+                .frame(width: circleSize, height: circleSize)
                 .scaleEffect(scale)
                 .offset(offset)
                 .clipShape(Circle())
@@ -224,7 +179,7 @@ struct ImageCropperView: View {
     }
 }
 
-// Preview remains the same
 #Preview {
     ImageCropperView(image: UIImage(systemName: "person.fill")!) { _ in }
 }
+

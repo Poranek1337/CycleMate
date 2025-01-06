@@ -80,6 +80,50 @@ class AuthenticationManager: ObservableObject {
         }
     }
     
+    //MARK: - Email Authentication
+    func createUserWithEmailAndWaitForVerification(email: String, password: String) async throws {
+        print("📧 Creating user with email: \(email)")
+        
+        let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
+        let user = authResult.user
+        
+        // Create initial user document in Firestore
+        let userData: [String: Any] = [
+            "id": user.uid,
+            "email": email,
+            "firstName": "",
+            "lastName": "",
+            "photoURL": "",
+            "createdAt": FieldValue.serverTimestamp(),
+            "dateOfBirth": NSNull(),
+            "provider": "email",
+            "isProfileCompleted": false
+        ]
+        
+        // Create user document first
+        try await db.collection("users").document(user.uid).setData(userData)
+        
+        // Send verification email after document creation
+        try await user.sendEmailVerification()
+        print("✉️ Verification email sent to: \(email)")
+        
+        // Set current user immediately
+        self.currentUser = AuthUser(
+            id: user.uid,
+            firstName: "",
+            lastName: "",
+            email: email,
+            photoURL: "",
+            createdAt: Date(),
+            dateOfBirth: nil,
+            provider: .email,
+            isProfileCompleted: false
+        )
+        
+        self.isAuthenticated = true
+        self.needsProfileCompletion = true
+    }
+    
     // MARK: - Google Authentication
     // Rest of Google authentication methods remain the same
     func signInWithGoogle() async throws {
@@ -162,21 +206,20 @@ class AuthenticationManager: ObservableObject {
     /// Loads an existing user from Firestore.
     /// - Parameter firebaseId: The Firebase user ID.
     private func loadExistingUser(firebaseId: String) async throws {
-        let document = try await db.collection("users").document(firebaseId)
-            .getDocument(source: .default)
+        let document = try await db.collection("users").document(firebaseId).getDocument()
         
         guard let data = document.data(),
-              let firstName = data["firstName"] as? String,
-              let lastName = data["lastName"] as? String,
-              let email = data["email"] as? String,
-              let dateOfBirth = data["dateOfBirth"] as? Timestamp,
-              let photoURL = data["photoURL"] as? String,
-              let createdAt = data["createdAt"] as? Timestamp,
-              let isProfileCompleted = data["isProfileCompleted"] as? Bool else {
+              let email = data["email"] as? String else {
             throw AuthError.userNotFound
         }
         
-        print("👤 User found: \(firstName) \(lastName)")
+        // Handle optional fields with default values
+        let firstName = data["firstName"] as? String ?? ""
+        let lastName = data["lastName"] as? String ?? ""
+        let photoURL = data["photoURL"] as? String ?? ""
+        let createdAt = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+        let dateOfBirth = (data["dateOfBirth"] as? Timestamp)?.dateValue()
+        let isProfileCompleted = data["isProfileCompleted"] as? Bool ?? false
         
         let user = AuthUser(
             id: firebaseId,
@@ -184,16 +227,15 @@ class AuthenticationManager: ObservableObject {
             lastName: lastName,
             email: email,
             photoURL: photoURL,
-            createdAt: createdAt.dateValue(),
-            dateOfBirth: dateOfBirth.dateValue(),
-            provider: .google,
+            createdAt: createdAt,
+            dateOfBirth: dateOfBirth,
+            provider: .email,
             isProfileCompleted: isProfileCompleted
         )
         
         self.currentUser = user
         self.isAuthenticated = true
-        self.needsProfileCompletion = false
-        print("✅ Session authenticated for: \(firstName) \(lastName)")
+        self.needsProfileCompletion = !isProfileCompleted
     }
     
     // Rest of profile management methods remain the same
@@ -218,7 +260,7 @@ class AuthenticationManager: ObservableObject {
         
         // Create user document in Firestore
         let userData: [String: Any] = [
-            "id": firebaseId,
+            "id": authResult.user.uid,
             "firstName": firstName,
             "lastName": lastName,
             "email": authResult.user.email ?? "",
@@ -229,11 +271,11 @@ class AuthenticationManager: ObservableObject {
             "isProfileCompleted": true
         ]
         
-        try await db.collection("users").document(firebaseId).setData(userData)
+        try await db.collection("users").document(authResult.user.uid).setData(userData)
         
         // Update local user
         let updatedUser = AuthUser(
-            id: firebaseId,
+            id: authResult.user.uid,
             firstName: firstName,
             lastName: lastName,
             email: authResult.user.email,
@@ -255,38 +297,58 @@ class AuthenticationManager: ObservableObject {
     
     // MARK: - Profile Image Management
     func uploadProfileImage(_ image: UIImage) async throws {
-        guard let user = currentUser else { throw AuthError.userNotFound }
+        // First verify current user exists
+        guard let currentFirebaseUser = Auth.auth().currentUser else {
+            print("❌ No Firebase user found")
+            throw AuthError.userNotFound
+        }
+        
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            print("❌ Failed to convert image to data")
             throw AuthError.imageUploadFailed
         }
         
-        let fileName = "\(user.id)_profile.jpg"
+        print("📸 Starting profile image upload for user: \(currentFirebaseUser.uid)")
+        
+        // First verify user document exists
+        let userDoc = try await db.collection("users").document(currentFirebaseUser.uid).getDocument()
+        guard userDoc.exists else {
+            print("❌ User document not found in Firestore")
+            throw AuthError.userNotFound
+        }
+        
+        // Generate unique filename with timestamp
+        let fileName = "\(currentFirebaseUser.uid)_\(Int(Date().timeIntervalSince1970)).jpg"
         let imageRef = storage.child("profile_images/\(fileName)")
         
-        _ = try await imageRef.putDataAsync(imageData)
-        let url = try await imageRef.downloadURL()
-        
-        try await db.collection("users").document(user.id).updateData([
-            "photoURL": url.absoluteString
-        ])
-        
-        var updatedUser = user
-        updatedUser.photoURL = url.absoluteString
-        self.currentUser = updatedUser
+        do {
+            print("📤 Uploading image data...")
+            _ = try await imageRef.putDataAsync(imageData)
+            
+            print("🔗 Getting download URL...")
+            let url = try await imageRef.downloadURL()
+            
+            print("💾 Updating Firestore document...")
+            try await db.collection("users").document(currentFirebaseUser.uid).updateData([
+                "photoURL": url.absoluteString,
+                "isProfileCompleted": true
+            ])
+            
+            // Update local user state
+            print("🔄 Updating local user state...")
+            try await loadExistingUser(firebaseId: currentFirebaseUser.uid)
+            print("✅ Profile image upload completed successfully")
+        } catch {
+            print("❌ Profile image upload failed with error: \(error)")
+            throw AuthError.imageUploadFailed
+        }
     }
     
     // MARK: - Sign Out
     func signOut() throws {
         do {
-            // Clear local state first
-            clearUserState()
-            
-            // Sign out from Firebase
             try Auth.auth().signOut()
-            
-            // Sign out from Google
-            GIDSignIn.sharedInstance.signOut()
-            
+            clearUserState()
             print("✅ User signed out successfully")
         } catch {
             print("❌ Failed to sign out: \(error)")
@@ -294,5 +356,3 @@ class AuthenticationManager: ObservableObject {
         }
     }
 }
-
-// End of file. No additional code.

@@ -8,6 +8,7 @@ import SwiftUI
 import GoogleSignIn
 import Firebase
 import FirebaseAuth
+import FirebaseFirestore
 
 /// ViewModel responsible for handling authentication logic.
 @MainActor
@@ -86,29 +87,97 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Authentication Methods
-    
-    /// Fetches the current user data.
+    // MARK: - User Management
     func fetchUser() async {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         guard let snapshot = try? await Firestore.firestore().collection("users").document(uid).getDocument() else { return }
         self.currentUser = try? snapshot.data(as: User.self)
     }
 
-    /// Signs in the user with email and password.
-    func signInWithEmail() async {
+    // MARK: - Email Authentication Methods
+    func sendVerificationEmail(email: String, password: String) async -> Bool {
         do {
-            // Add your email sign in logic here
-            print(" Attempting email sign in")
-            // try await authManager.signInWithEmail(email: email, password: password)
+            let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
+            try await authResult.user.sendEmailVerification()
+            
+            self.email = email
+            UserDefaults.standard.set(email, forKey: "temp_email")
+            UserDefaults.standard.set(password, forKey: "temp_password")
+            
+            print("✉️ Verification email sent to: \(email)")
+            return true
         } catch {
-            print(" Email Sign In failed: \(error)")
-            errorMessage = "Failed to sign in with email. Please try again."
+            print("❌ Failed to send verification email: \(error)")
+            errorMessage = "Failed to send verification email. Please try again."
+            showError = true
+            return false
+        }
+    }
+    
+    func createVerifiedUser(email: String, password: String) async throws {
+        print("🔄 Creating verified user account...")
+        let result = try await Auth.auth().signIn(withEmail: email, password: password)
+        let firebaseId = result.user.uid
+        print("✅ Signed in verified user: \(firebaseId)")
+        
+        guard result.user.isEmailVerified else {
+            print("❌ User email is not verified")
+            throw AuthError.signInFailed
+        }
+        
+        let userData: [String: Any] = [
+            "id": firebaseId,
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email,
+            "dateOfBirth": Timestamp(date: dateOfBirth),
+            "photoURL": "",
+            "createdAt": FieldValue.serverTimestamp(),
+            "provider": "email",
+            "isProfileCompleted": false
+        ]
+        
+        do {
+            try await Firestore.firestore().collection("users").document(firebaseId).setData(userData)
+            print("✅ Created user data in Firestore: \(firstName) \(lastName)")
+            
+            self.currentUser = User(
+                id: firebaseId,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                photoURL: "",
+                createdAt: Date(),
+                dateOfBirth: dateOfBirth,
+                provider: "email",
+                isProfileCompleted: false
+            )
+            
+            self.userSession = result.user
+            self.showUserDataForm = false
+            print("✅ View model state updated, ready for profile picture")
+            
+        } catch {
+            print("❌ Failed to create user document: \(error)")
+            throw AuthError.profileUpdateFailed
+        }
+    }
+
+    func signInWithEmail() async {
+        print("🔄 Attempting to sign in with email")
+        do {
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            self.userSession = result.user
+            await fetchUser()
+            print("✅ Successfully signed in with email")
+        } catch {
+            print("❌ Email sign in failed: \(error)")
+            errorMessage = "Failed to sign in. Please check your credentials."
             showError = true
         }
     }
 
-    /// Signs in the user with Google.
+    // MARK: - Google Authentication
     func signInWithGoogle() async throws {
         print("🔵 Starting Google Sign In from ViewModel")
         do {
@@ -128,7 +197,7 @@ class AuthViewModel: ObservableObject {
                     self.currentUser = try document.data(as: User.self)
                     await fetchUser() // Refresh user data
                     return // Return early as user exists
-                } 
+                }
                 
                 // Handle new user
                 print("⚠️ New user - needs profile completion")
@@ -148,11 +217,9 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Profile Management Methods
-    
-    /// Completes the user profile with additional information.
+    // MARK: - Profile Methods
     func completeUserProfile() async {
-        print(" Completing user profile")
+        print("📝 Completing user profile")
         do {
             try await authManager.updateUserProfile(
                 firstName: firstName,
@@ -160,27 +227,23 @@ class AuthViewModel: ObservableObject {
                 dateOfBirth: dateOfBirth
             )
             await fetchUser()
-            print(" Profile completed successfully")
+            print("✅ Profile completed successfully")
         } catch {
-            print(" Profile completion failed: \(error)")
+            print("❌ Profile completion failed: \(error)")
             errorMessage = "Failed to complete profile. Please try again."
             showError = true
         }
     }
 
-    // MARK: - Profile Image Methods
-    
-    /// Updates the user's profile image.
-    /// - Parameter image: The new profile image.
     func updateProfileImage(image: UIImage) async {
         do {
             userProfileImage = image
             try await authManager.uploadProfileImage(image)
             await fetchUser()
-            print(" Profile image updated successfully")
+            print("✅ Profile image updated successfully")
             showUserDataForm = false
         } catch {
-            print(" Profile image update failed: \(error)")
+            print("❌ Profile image update failed: \(error)")
             errorMessage = "Failed to update profile image. Please try again."
             showError = true
         }

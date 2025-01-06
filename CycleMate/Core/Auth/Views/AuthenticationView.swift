@@ -31,6 +31,9 @@ struct AuthenticationView: View {
     /// A flag indicating if the main tab view should be shown.
     @State private var showMainTabView = false
     
+    /// A new state for email signup
+    @State private var showEmailSignUp = false
+    
     /// The background opacity based on the offset.
     private var backgroundOpacity: Double {
         let progress = 1 - (offset / UIScreen.main.bounds.height)
@@ -65,7 +68,8 @@ struct AuthenticationView: View {
                         title: "Sign Up",
                         style: .primary
                     ) {
-                        // Add sign up action
+                        // Show email signup view
+                        showEmailSignUp = true
                     }
                     
                     AuthButton(
@@ -188,6 +192,9 @@ struct AuthenticationView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage)
+        }
+        .sheet(isPresented: $showEmailSignUp) {
+            EmailSignUpView()
         }
     }
     

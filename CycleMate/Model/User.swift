@@ -39,6 +39,41 @@ struct User: Identifiable, Codable, Equatable {
         return [firstName, lastName].compactMap { $0 }.joined(separator: " ")
     }
     
+    /// Custom decoder initialization
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.firstName = try container.decodeIfPresent(String.self, forKey: .firstName)
+        self.lastName = try container.decodeIfPresent(String.self, forKey: .lastName)
+        self.email = try container.decodeIfPresent(String.self, forKey: .email)
+        self.photoURL = try container.decodeIfPresent(String.self, forKey: .photoURL)
+        self.createdAt = try container.decode(Date.self, forKey: .createdAt)
+        self.dateOfBirth = try container.decodeIfPresent(Date.self, forKey: .dateOfBirth)
+        self.provider = try container.decode(String.self, forKey: .provider)
+        self.isProfileCompleted = try container.decode(Bool.self, forKey: .isProfileCompleted)
+    }
+    
+    /// Manual initialization
+    init(id: String,
+         firstName: String?,
+         lastName: String?,
+         email: String?,
+         photoURL: String?,
+         createdAt: Date,
+         dateOfBirth: Date?,
+         provider: String,
+         isProfileCompleted: Bool) {
+        self.id = id
+        self.firstName = firstName
+        self.lastName = lastName
+        self.email = email
+        self.photoURL = photoURL
+        self.createdAt = createdAt
+        self.dateOfBirth = dateOfBirth
+        self.provider = provider
+        self.isProfileCompleted = isProfileCompleted
+    }
+    
     /// Initializes a new instance of `User` from an `AuthUser`.
     /// - Parameter authUser: The authenticated user.
     init(from authUser: AuthUser) {
@@ -53,11 +88,20 @@ struct User: Identifiable, Codable, Equatable {
         self.isProfileCompleted = authUser.isProfileCompleted
     }
     
+    /// Coding keys for Codable conformance
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case firstName
+        case lastName
+        case email
+        case photoURL
+        case createdAt
+        case dateOfBirth
+        case provider
+        case isProfileCompleted
+    }
+    
     /// Checks if two `User` instances are equal.
-    /// - Parameters:
-    ///   - lhs: The left-hand side `User` instance.
-    ///   - rhs: The right-hand side `User` instance.
-    /// - Returns: A Boolean value indicating whether the two instances are equal.
     static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id
     }

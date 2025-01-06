@@ -18,6 +18,8 @@ enum AuthError: Error {
     case invalidPassword
     case imageProcessingFailed
     case imageUploadFailed
+    case emailVerificationFailed
+    case emailVerificationTimeout
     
     /// A description of the error.
     var description: String {
@@ -31,6 +33,9 @@ enum AuthError: Error {
         case .invalidPassword: return "Password must be at least 6 characters long."
         case .imageProcessingFailed: return "Failed to process image. Please try again."
         case .imageUploadFailed: return "Failed to upload image. Please try again."
+        case .emailVerificationFailed: return "Failed to verify email. Please try again."
+        case .emailVerificationTimeout: return "Email verification timed out. Please try again."
+
         }
     }
 }
