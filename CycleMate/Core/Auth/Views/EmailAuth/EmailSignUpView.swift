@@ -190,6 +190,7 @@ struct EmailSignUpView: View {
     private var dateOfBirthButton: some View {
         VStack(spacing: 5) {
             Button {
+                hideKeyboard()
                 withAnimation(.spring()) {
                     showDatePicker.toggle()
                 }
@@ -230,7 +231,6 @@ struct EmailSignUpView: View {
             continueButton
         }
         .padding()
-        .background(Color(.systemBackground))
     }
     
     private var termsCheckbox: some View {
@@ -323,8 +323,7 @@ struct EmailSignUpView: View {
             Task {
                 verificationStatus = .verifying
                 showVerificationPopup = true
-                await viewModel.sendVerificationEmail(email: email, password: password)
-                await checkVerification()
+                await AuthUtils.handleContinueButton(isFormValid: isFormValid, email: email, password: password, viewModel: viewModel)
             }
         } else {
             withAnimation {
@@ -333,34 +332,26 @@ struct EmailSignUpView: View {
         }
     }
     
-    private func checkVerification() async {
-        for _ in 0..<60 { // Check for 5 minutes
-            try? await Task.sleep(nanoseconds: 5_000_000_000)
-            if let user = Auth.auth().currentUser {
-                try? await user.reload()
-                if user.isEmailVerified {
-                    withAnimation {
-                        verificationStatus = .success
-                    }
-                    return
-                }
-            }
-        }
-        verificationStatus = .failed
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .center) {
             VStack(spacing: 0) {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        headerSection
-                        titleSection
-                        formSection
-                    }
+                // Content area
+                VStack(spacing: 0) {
+                    headerSection
+                    titleSection
+                    formSection
+                    Spacer() // This will push content up
                 }
+                
+                // Bottom section always stays at bottom
                 bottomSection
+                    .background(Color(.systemBackground))
+                    .ignoresSafeArea(.keyboard) // This prevents keyboard from pushing content up
             }
             
             if showDatePicker {

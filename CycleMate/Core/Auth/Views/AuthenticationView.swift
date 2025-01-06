@@ -34,6 +34,9 @@ struct AuthenticationView: View {
     /// A new state for email signup
     @State private var showEmailSignUp = false
     
+    /// A state for email login
+    @State private var showEmailLogin = false
+    
     /// The background opacity based on the offset.
     private var backgroundOpacity: Double {
         let progress = 1 - (offset / UIScreen.main.bounds.height)
@@ -68,7 +71,6 @@ struct AuthenticationView: View {
                         title: "Sign Up",
                         style: .primary
                     ) {
-                        // Show email signup view
                         showEmailSignUp = true
                     }
                     
@@ -76,7 +78,7 @@ struct AuthenticationView: View {
                         title: "Login to CycleMate",
                         style: .outlined
                     ) {
-                        // Add login action
+                        showEmailLogin = true
                     }
                     
                     // Divider with 'or'
@@ -195,6 +197,9 @@ struct AuthenticationView: View {
         }
         .sheet(isPresented: $showEmailSignUp) {
             EmailSignUpView()
+        }
+        .sheet(isPresented: $showEmailLogin) {
+            EmailLoginView(isPresented: $showEmailLogin)
         }
     }
     

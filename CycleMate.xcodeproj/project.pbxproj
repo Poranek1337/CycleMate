@@ -15,6 +15,9 @@
 		D0059B382D28535700B3D100 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B372D28535400B3D100 /* User.swift */; };
 		D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */; };
 		D039C6F32CF4BB83000F6ACE /* FirstLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D039C6F22CF4BB83000F6ACE /* FirstLaunchView.swift */; };
+		D06BC1C42D2C34FB00E504C8 /* AuthUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06BC1C32D2C34F300E504C8 /* AuthUtils.swift */; };
+		D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */; };
+		D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06BC1C92D2C3E5C00E504C8 /* EmailLoginView.swift */; };
 		D0B592FA2C20E3390026D977 /* CycleMateApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B592F92C20E3390026D977 /* CycleMateApp.swift */; };
 		D0B592FC2C20E3390026D977 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B592FB2C20E3390026D977 /* ContentView.swift */; };
 		D0B592FE2C20E33A0026D977 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0B592FD2C20E33A0026D977 /* Assets.xcassets */; };
@@ -85,6 +88,9 @@
 		D0059B372D28535400B3D100 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailSignUpView.swift; sourceTree = "<group>"; };
 		D039C6F22CF4BB83000F6ACE /* FirstLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchView.swift; sourceTree = "<group>"; };
+		D06BC1C32D2C34F300E504C8 /* AuthUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthUtils.swift; sourceTree = "<group>"; };
+		D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordResetView.swift; sourceTree = "<group>"; };
+		D06BC1C92D2C3E5C00E504C8 /* EmailLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailLoginView.swift; sourceTree = "<group>"; };
 		D0B592F62C20E3390026D977 /* CycleMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CycleMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0B592F92C20E3390026D977 /* CycleMateApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleMateApp.swift; sourceTree = "<group>"; };
 		D0B592FB2C20E3390026D977 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -216,20 +222,23 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		D0059B3B2D2B56EC00B3D100 /* EmailSignUp */ = {
+		D0059B3B2D2B56EC00B3D100 /* EmailAuth */ = {
 			isa = PBXGroup;
 			children = (
-				D0059B4F2D2B587500B3D100 /* Helpers */,
+				D06BC1C92D2C3E5C00E504C8 /* EmailLoginView.swift */,
+				D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */,
+				D06BC1C22D2C34E800E504C8 /* Services */,
 				D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */,
 			);
-			path = EmailSignUp;
+			path = EmailAuth;
 			sourceTree = "<group>";
 		};
-		D0059B4F2D2B587500B3D100 /* Helpers */ = {
+		D06BC1C22D2C34E800E504C8 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D06BC1C32D2C34F300E504C8 /* AuthUtils.swift */,
 			);
-			path = Helpers;
+			path = Services;
 			sourceTree = "<group>";
 		};
 		D0B592ED2C20E3390026D977 = {
@@ -373,7 +382,7 @@
 		D0C4CBE02D0DBBBF0047EAA9 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D0059B3B2D2B56EC00B3D100 /* EmailSignUp */,
+				D0059B3B2D2B56EC00B3D100 /* EmailAuth */,
 				D0CF02AA2D0F314600D0B15C /* Components */,
 				D0C4CBEC2D0DC06B0047EAA9 /* AuthenticationView.swift */,
 				D0C4CBEE2D0DC0A80047EAA9 /* EmailAuthView.swift */,
@@ -647,9 +656,11 @@
 				D0CF02AE2D0F316300D0B15C /* ImageCropperView.swift in Sources */,
 				D0059B302D282F0500B3D100 /* CalendarView.swift in Sources */,
 				D0CF02772D0E0D9000D0B15C /* AuthButton.swift in Sources */,
+				D06BC1C42D2C34FB00E504C8 /* AuthUtils.swift in Sources */,
 				D0CBC0A32D0A5058007513ED /* OnboardingSlide.swift in Sources */,
 				D0B592FC2C20E3390026D977 /* ContentView.swift in Sources */,
 				D0059B282D282EB100B3D100 /* HomeView.swift in Sources */,
+				D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */,
 				D0CF02AC2D0F315900D0B15C /* ImagePickerView.swift in Sources */,
 				D0C4CBE42D0DBC070047EAA9 /* AuthUser.swift in Sources */,
 				D0CF027D2D0E531000D0B15C /* ViewModifiers.swift in Sources */,
@@ -662,6 +673,7 @@
 				D0C4CBED2D0DC06B0047EAA9 /* AuthenticationView.swift in Sources */,
 				D0CF02792D0E4B8600D0B15C /* ProfilePictureView.swift in Sources */,
 				D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */,
+				D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */,
 				D0CBC0992D0A4E80007513ED /* PageIndicator.swift in Sources */,
 				D0059B342D282F9800B3D100 /* MainTabView.swift in Sources */,
 				D0059B242D282E0C00B3D100 /* CustomTabBar.swift in Sources */,
