@@ -61,8 +61,7 @@ struct AuthenticationView: View {
                     .fill(Color.gray.opacity(0.15))
                     .frame(width: 50, height: 5)
                     .cornerRadius(2.5)
-                    .padding(.top, 12)
-                    .padding(.bottom, 30)
+                    .padding(.top, 20)
                 
                 // Content
                 VStack(spacing: 25) {
@@ -144,6 +143,8 @@ struct AuthenticationView: View {
                 .padding(.horizontal, 25)
                 .padding(.top, 20)
                 .padding(.bottom, 40)
+                
+                Spacer()
             }
             .frame(maxWidth: .infinity)
             .frame(height: UIScreen.main.bounds.height / 1.7)
@@ -198,8 +199,10 @@ struct AuthenticationView: View {
         .sheet(isPresented: $showEmailSignUp) {
             EmailSignUpView()
         }
-        .sheet(isPresented: $showEmailLogin) {
-            EmailLoginView(isPresented: $showEmailLogin)
+        .overlay {
+            if showEmailLogin {
+                EmailLoginView(isPresented: $showEmailLogin)
+            }
         }
     }
     

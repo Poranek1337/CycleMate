@@ -16,18 +16,16 @@ struct SplashScreenView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            // Navigation destinations
-            if showNextView {
-                Group {
-                    if let user = authViewModel.currentUser {
-                        // User has an active session, show MainTabView
-                        MainTabView()
-                            .transition(.opacity)
-                    } else {
-                        // No active session, show FirstLaunchView
-                        FirstLaunchView()
-                            .transition(.opacity)
-                    }
+            // Pre-load next view immediately but keep it hidden
+            Group {
+                if let user = authViewModel.currentUser {
+                    // User has an active session, show MainTabView
+                    MainTabView()
+                        .opacity(showNextView ? 1 : 0)
+                } else {
+                    // No active session, show FirstLaunchView
+                    FirstLaunchView()
+                        .opacity(showNextView ? 1 : 0)
                 }
             }
             
@@ -54,12 +52,13 @@ struct SplashScreenView: View {
                         // Animate splash screen after delay
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             withAnimation(.easeInOut(duration: 0.7)) {
-                                self.offset = geometry.size.height + 100
-                                self.padding = 50
+                                // Increased offset to move splash screen further down
+                                self.offset = geometry.size.height + 200
+                                self.padding = 100
                             }
                             
                             // Show next view after animation
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                 withAnimation(.easeIn(duration: 0.3)) {
                                     showNextView = true
                                 }

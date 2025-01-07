@@ -83,7 +83,7 @@ struct MainTabView: View {
                         deviceOrientation: effectiveOrientation
                     )
                     .opacity(isTabBarVisible ? 1 : 0)
-                    .offset(x: isTabBarVisible ? 0 : -100)
+                    .offset(x: isTabBarVisible ? 0 : effectiveOrientation == .landscapeRight ? -100 : 100)
                     .animation(.easeInOut(duration: 0.3), value: isTabBarVisible)
                     .allowsHitTesting(isTabBarVisible)
                 } else {
@@ -188,5 +188,3 @@ extension View {
 #Preview {
     MainTabView()
 }
-
-// End of file

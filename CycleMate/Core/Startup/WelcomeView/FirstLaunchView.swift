@@ -28,7 +28,13 @@ struct FirstLaunchView: View {
             if shouldShowMainTab {
                 MainTabView()
             } else {
-                onboardingContent
+                // Wrap the onboarding content in a ZStack with a solid background
+                ZStack {
+                    // Add solid background color
+                    Color.white.edgesIgnoringSafeArea(.all)
+                    
+                    onboardingContent
+                }
             }
         }
         .onChange(of: authViewModel.currentUser) { user in
@@ -41,30 +47,31 @@ struct FirstLaunchView: View {
     /// The content for the onboarding slides.
     private var onboardingContent: some View {
         ZStack {
-            // Base content
+            // Background Image
+            if let imageName = viewModel.slides[viewModel.currentPage].imageName {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .edgesIgnoringSafeArea(.all)
+                    .transition(.opacity)
+            }
+            
+            // Semi-transparent overlay
+            Color.black.opacity(0.4)
+                .edgesIgnoringSafeArea(.all)
+            
+            // Content
             VStack(spacing: 30) {
-                // Image section
-                if let imageName = viewModel.slides[viewModel.currentPage].imageName {
-                    Image(imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 250)
-                        .padding(.top, 50)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                        .offset(y: viewModel.animateContent ? 0 : -50)
-                        .opacity(viewModel.animateContent ? 1 : 0)
-                }
-                
                 Spacer()
                 
-                // Animated text content
+                // Text content at the bottom
                 VStack(spacing: 20) {
                     // Title with animated characters
                     HStack(spacing: 0) {
                         ForEach(Array(viewModel.slides[viewModel.currentPage].title.enumerated()), id: \.offset) { index, character in
                             Text(String(character))
                                 .font(.system(size: 32, weight: .bold))
-                                .foregroundColor(.primary)
+                                .foregroundColor(.white)
                                 .transition(AnyTransition.opacity
                                     .combined(with: .move(edge: .top))
                                     .animation(.easeInOut(duration: 0.3)
@@ -78,7 +85,7 @@ struct FirstLaunchView: View {
                         ForEach(Array(viewModel.slides[viewModel.currentPage].description.enumerated()), id: \.offset) { index, character in
                             Text(String(character))
                                 .font(.body)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.white)
                                 .transition(AnyTransition.opacity
                                     .combined(with: .move(edge: .bottom))
                                     .animation(.easeInOut(duration: 0.3)
@@ -93,7 +100,7 @@ struct FirstLaunchView: View {
                 HStack(spacing: 8) {
                     ForEach(0..<viewModel.totalPages, id: \.self) { index in
                         Capsule()
-                            .fill(Color.primary.opacity(index == viewModel.currentPage ? 1 : 0.3))
+                            .fill(Color.white.opacity(index == viewModel.currentPage ? 1 : 0.3))
                             .frame(width: index == viewModel.currentPage ? 16 : 4, height: 4)
                             .animation(.spring(response: 0.6, dampingFraction: 0.8), value: viewModel.currentPage)
                     }
@@ -110,16 +117,10 @@ struct FirstLaunchView: View {
                 } label: {
                     Text(viewModel.currentPage == viewModel.totalPages - 1 ? "Get Started" : "Next")
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background {
-                            if let accentColor = viewModel.slides[viewModel.currentPage].accentColor {
-                                Color(accentColor)
-                            } else {
-                                Color.accentColor
-                            }
-                        }
+                        .background(Color.white.opacity(0.2))
                         .cornerRadius(15)
                 }
                 .padding(.horizontal, 40)

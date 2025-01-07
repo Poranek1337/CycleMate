@@ -33,6 +33,9 @@ struct EmailLoginView: View {
     /// A flag indicating whether validation errors should be shown.
     @State private var showValidationErrors = false
     
+    // Add keyboard state
+    @State private var keyboardHeight: CGFloat = 0
+    
     // Validation states
     private var isEmailValid: Bool { !viewModel.email.isEmpty }
     private var isPasswordValid: Bool { !viewModel.password.isEmpty }
@@ -50,125 +53,128 @@ struct EmailLoginView: View {
                 }
             
             // Card View
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
                 // Handle indicator
                 Rectangle()
                     .fill(Color.gray.opacity(0.15))
                     .frame(width: 50, height: 5)
                     .cornerRadius(2.5)
-                    .padding(.top, 12)
-                    .padding(.bottom, 30)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 15)
+                    .padding(.bottom, 10)
                 
                 // Content
-                ScrollView {
-                    VStack(spacing: 25) {
-                        // Title and description
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Login to CycleMate")
-                                .font(.system(size: 32, weight: .bold))
-                                .foregroundColor(.primary)
-                            
-                            Text("Welcome back! Please enter your details to continue.")
-                                .font(.system(size: 16))
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 20)
-                        
-                        // Form fields with validation
-                        VStack(spacing: 20) {
-                            // Email field
-                            TextField("Email", text: $viewModel.email)
-                                .textInputAutocapitalization(.never)
-                                .keyboardType(.emailAddress)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 30)
-                                        .stroke(showValidationErrors && !isEmailValid ? Color.red : Color.gray, lineWidth: 1)
-                                )
-                            
-                            if showValidationErrors && !isEmailValid {
-                                Text("Please enter your email")
-                                    .foregroundColor(.red)
-                                    .font(.caption)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            
-                            // Password field
-                            SecureField("Password", text: $viewModel.password)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 30)
-                                        .stroke(showValidationErrors && !isPasswordValid ? Color.red : Color.gray, lineWidth: 1)
-                                )
-                            
-                            if showValidationErrors && !isPasswordValid {
-                                Text("Please enter your password")
-                                    .foregroundColor(.red)
-                                    .font(.caption)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
-                        
-                        // Forgot password button
-                        Button {
-                            showPasswordReset = true
-                        } label: {
-                            Text("Forgot Password?")
-                                .foregroundColor(Color("second"))
-                                .font(.subheadline)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        
-                        // Create account section
-                        HStack {
-                            Text("Don't have an account?")
-                                .foregroundColor(.gray)
-                            Button {
-                                showEmailSignUp = true
-                            } label: {
-                                Text("Sign Up")
-                                    .foregroundColor(Color("second"))
-                                    .fontWeight(.semibold)
-                            }
-                        }
-                        .font(.subheadline)
-                    }
-                    .padding(.horizontal, 25)
-                }
-                
-                // Login button
-                Button {
-                    if isFormValid {
-                        Task {
-                            await signInUser()
-                        }
-                    } else {
-                        withAnimation {
-                            showValidationErrors = true
-                        }
-                    }
-                } label: {
-                    Text("Login")
-                        .font(.title3)
-                        .fontWeight(.semibold)
+                VStack(alignment: .leading, spacing: 10) {
+                    // Title and description
+                    Text("Login to CycleMate")
+                        .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.primary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(isFormValid ? Color("second") : Color.gray.opacity(0.3))
-                        .cornerRadius(30)
+                    
+                    Text("Welcome back! Please enter your details to continue.")
+                        .font(.system(size: 16))
+                        .foregroundColor(.gray)
+                        .padding(.bottom, 2)
+                    
+                    // Form fields with validation
+                    VStack(spacing: 10) {
+                        // Email field with increased height
+                        TextField("Email", text: $viewModel.email)
+                            .textInputAutocapitalization(.never)
+                            .keyboardType(.emailAddress)
+                            .padding(.vertical, 16) // Increased padding
+                            .padding(.horizontal, 12)
+                            .frame(maxWidth: .infinity)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 30)
+                                    .stroke(showValidationErrors && !isEmailValid ? Color.red : Color.gray, lineWidth: 1)
+                            )
+                        
+                        if showValidationErrors && !isEmailValid {
+                            Text("Please enter your email")
+                                .foregroundColor(.red)
+                                .font(.caption)
+                                .padding(.bottom, -5)
+                        }
+                        
+                        // Password field with increased height
+                        SecureField("Password", text: $viewModel.password)
+                            .padding(.vertical, 16) // Increased padding
+                            .padding(.horizontal, 12)
+                            .frame(maxWidth: .infinity)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 30)
+                                    .stroke(showValidationErrors && !isPasswordValid ? Color.red : Color.gray, lineWidth: 1)
+                            )
+                        
+                        if showValidationErrors && !isPasswordValid {
+                            Text("Please enter your password")
+                                .foregroundColor(.red)
+                                .font(.caption)
+                                .padding(.bottom, -5)
+                        }
+                    }
+                    
+                    // Forgot password button
+                    Button {
+                        showPasswordReset = true
+                    } label: {
+                        Text("Forgot Password?")
+                            .foregroundColor(Color("second"))
+                            .font(.subheadline)
+                    }
+
+                    .padding(.top, 2)
+                    
+                    // Create account section
+                    HStack {
+                        Text("Don't have an account?")
+                            .foregroundColor(.gray)
+                        Button {
+                            showEmailSignUp = true
+                        } label: {
+                            Text("Sign Up")
+                                .foregroundColor(Color("second"))
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .font(.subheadline)
+                    .padding(.top, 2)
+                    
+                    // Login button
+                    Button {
+                        if isFormValid {
+                            Task {
+                                await signInUser()
+                            }
+                        } else {
+                            withAnimation {
+                                showValidationErrors = true
+                            }
+                        }
+                    } label: {
+                        Text("Login")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(isFormValid ? Color("second") : Color.gray.opacity(0.3))
+                            .cornerRadius(30)
+                    }
+                    .padding(.top, 40)
                 }
                 .padding(.horizontal, 25)
-                .padding(.vertical, 20)
-                .background(Color(.systemBackground))
+                .padding(.top, 5)
+                Spacer()
             }
             .frame(maxWidth: .infinity)
-            .frame(height: UIScreen.main.bounds.height / 1.7)
+            .frame(height: UIScreen.main.bounds.height / 2.2)
             .background(Color(.systemBackground))
             .cornerRadius(25, corners: [.topLeft, .topRight])
             .offset(y: offset)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
+            .offset(y: keyboardHeight > 0 ? -keyboardHeight/2 : 0)
             .gesture(
                 DragGesture()
                     .onChanged { value in
@@ -195,7 +201,25 @@ struct EmailLoginView: View {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 offset = 0
             }
+            
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        keyboardHeight = keyboardFrame.height
+                    }
+                }
+            }
+            
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    keyboardHeight = 0
+                }
+            }
         }
+        .onDisappear {
+            NotificationCenter.default.removeObserver(self)
+        }
+        
         .alert("Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -210,7 +234,6 @@ struct EmailLoginView: View {
         .onChange(of: viewModel.userSession) { newValue in
             if newValue != nil {
                 dismissCard()
-                // Navigate to MainTabView after successful login
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                    let window = windowScene.windows.first {
                     window.rootViewController = UIHostingController(rootView: MainTabView())

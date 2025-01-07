@@ -19,17 +19,19 @@ class FirstLaunchViewModel: ObservableObject {
         OnboardingSlide(
             title: "Welcome to CycleMate!",
             description: "Your cycling companion app.",
-            imageName: "world",
+            imageName: "zdj1",
             accentColor: "second"
         ),
         OnboardingSlide(
             title: "Track your cycling journey",
             description: "Monitor your progress",
+            imageName: "zdj2",
             accentColor: "second"
         ),
         OnboardingSlide(
             title: "Let's get started!",
             description: "Begin your adventure",
+            imageName: "zdj3",
             accentColor: "second"
         )
     ]
@@ -66,6 +68,3 @@ class FirstLaunchViewModel: ObservableObject {
         }
     }
 }
-
-// End of file. No additional code.
-
