@@ -28,11 +28,8 @@ struct FirstLaunchView: View {
             if shouldShowMainTab {
                 MainTabView()
             } else {
-                // Wrap the onboarding content in a ZStack with a solid background
+                // Wrap the onboarding content in a ZStack
                 ZStack {
-                    // Add solid background color
-                    Color.white.edgesIgnoringSafeArea(.all)
-                    
                     onboardingContent
                 }
             }

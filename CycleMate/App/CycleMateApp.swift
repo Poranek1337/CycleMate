@@ -59,7 +59,7 @@ struct CycleMateApp: App {
     
     var body: some Scene {
         WindowGroup {
-            SplashScreenView()
+            FirstLaunchView()
                 .environmentObject(authViewModel)
         }
     }

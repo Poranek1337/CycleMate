@@ -11,25 +11,30 @@ struct SplashScreenView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var offset: CGFloat = 0
     @State private var padding: CGFloat = 0
-    @State private var showNextView = false
+    @State private var showContent = false
     
     // MARK: - Body
     var body: some View {
         ZStack {
-            // Pre-load next view immediately but keep it hidden
+            // Content layer - Always visible but initially without its white background
             Group {
                 if let user = authViewModel.currentUser {
                     // User has an active session, show MainTabView
                     MainTabView()
-                        .opacity(showNextView ? 1 : 0)
+                        .background(Color.clear)
                 } else {
                     // No active session, show FirstLaunchView
                     FirstLaunchView()
-                        .opacity(showNextView ? 1 : 0)
+                        .background(Color.clear)
                 }
             }
             
-            // Splash screen content
+            // Green background that covers the entire screen
+            Color("second")
+                .edgesIgnoringSafeArea(.all)
+                .opacity(showContent ? 0 : 1)
+            
+            // Splash screen overlay with bike
             GeometryReader { geometry in
                 ZStack {
                     ArcShape()
@@ -50,19 +55,11 @@ struct SplashScreenView: View {
                         try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
                         
                         // Animate splash screen after delay
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            withAnimation(.easeInOut(duration: 0.7)) {
-                                // Increased offset to move splash screen further down
-                                self.offset = geometry.size.height + 200
-                                self.padding = 100
-                            }
-                            
-                            // Show next view after animation
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                withAnimation(.easeIn(duration: 0.3)) {
-                                    showNextView = true
-                                }
-                            }
+                        withAnimation(.easeInOut(duration: 0.7)) {
+                            // Increased offset to move splash screen further down
+                            self.offset = geometry.size.height + 200
+                            self.padding = 100
+                            self.showContent = true
                         }
                     }
                 }
@@ -93,5 +90,3 @@ struct SplashScreenView_Previews: PreviewProvider {
             .environmentObject(AuthViewModel())
     }
 }
-
-// End of file. No additional code.
