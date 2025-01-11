@@ -63,6 +63,11 @@
 		D0F5F1E62D32B45C000D6611 /* ColorGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1E52D32B458000D6611 /* ColorGenerator.swift */; };
 		D0F5F1E82D32B89D000D6611 /* ProfileInitialsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1E72D32B89A000D6611 /* ProfileInitialsView.swift */; };
 		D0F5F1EB2D32E270000D6611 /* ProfileImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1EA2D32E26A000D6611 /* ProfileImageManager.swift */; };
+		D0F5F1EE2D32F177000D6611 /* MapPreviewComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1ED2D32F16D000D6611 /* MapPreviewComponent.swift */; };
+		D0F5F1F02D32F1AD000D6611 /* BikesComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1EF2D32F1AA000D6611 /* BikesComponent.swift */; };
+		D0F5F1F22D32F1C1000D6611 /* StatsComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1F12D32F1BE000D6611 /* StatsComponent.swift */; };
+		D0F5F1F42D32F1D4000D6611 /* MonthlyChartComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1F32D32F1D0000D6611 /* MonthlyChartComponent.swift */; };
+		D0F5F1FA2D32F257000D6611 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1F92D32F255000D6611 /* LocationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +132,11 @@
 		D0F5F1E52D32B458000D6611 /* ColorGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorGenerator.swift; sourceTree = "<group>"; };
 		D0F5F1E72D32B89A000D6611 /* ProfileInitialsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInitialsView.swift; sourceTree = "<group>"; };
 		D0F5F1EA2D32E26A000D6611 /* ProfileImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageManager.swift; sourceTree = "<group>"; };
+		D0F5F1ED2D32F16D000D6611 /* MapPreviewComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPreviewComponent.swift; sourceTree = "<group>"; };
+		D0F5F1EF2D32F1AA000D6611 /* BikesComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BikesComponent.swift; sourceTree = "<group>"; };
+		D0F5F1F12D32F1BE000D6611 /* StatsComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsComponent.swift; sourceTree = "<group>"; };
+		D0F5F1F32D32F1D0000D6611 /* MonthlyChartComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyChartComponent.swift; sourceTree = "<group>"; };
+		D0F5F1F92D32F255000D6611 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,17 +193,18 @@
 		D0059B252D282E9D00B3D100 /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				D0059B262D282EA200B3D100 /* View */,
+				D0F5F1EC2D32F0B1000D6611 /* Components */,
+				D0059B262D282EA200B3D100 /* Views */,
 			);
 			path = Home;
 			sourceTree = "<group>";
 		};
-		D0059B262D282EA200B3D100 /* View */ = {
+		D0059B262D282EA200B3D100 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				D0059B272D282EAC00B3D100 /* HomeView.swift */,
 			);
-			path = View;
+			path = Views;
 			sourceTree = "<group>";
 		};
 		D0059B292D282EBC00B3D100 /* Map */ = {
@@ -541,6 +552,42 @@
 			path = ProfileImage;
 			sourceTree = "<group>";
 		};
+		D0F5F1EC2D32F0B1000D6611 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				D0F5F1F52D32F21B000D6611 /* MapPreviewComponent */,
+				D0F5F1F32D32F1D0000D6611 /* MonthlyChartComponent.swift */,
+				D0F5F1F12D32F1BE000D6611 /* StatsComponent.swift */,
+				D0F5F1EF2D32F1AA000D6611 /* BikesComponent.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		D0F5F1F52D32F21B000D6611 /* MapPreviewComponent */ = {
+			isa = PBXGroup;
+			children = (
+				D0F5F1F82D32F24A000D6611 /* Services */,
+				D0F5F1F72D32F240000D6611 /* Views */,
+			);
+			path = MapPreviewComponent;
+			sourceTree = "<group>";
+		};
+		D0F5F1F72D32F240000D6611 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D0F5F1ED2D32F16D000D6611 /* MapPreviewComponent.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D0F5F1F82D32F24A000D6611 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D0F5F1F92D32F255000D6611 /* LocationManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -677,6 +724,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0059B382D28535700B3D100 /* User.swift in Sources */,
+				D0F5F1F42D32F1D4000D6611 /* MonthlyChartComponent.swift in Sources */,
+				D0F5F1F22D32F1C1000D6611 /* StatsComponent.swift in Sources */,
 				D0C4CBE92D0DBCF00047EAA9 /* AuthViewModel.swift in Sources */,
 				D0CF02AE2D0F316300D0B15C /* ImageCropperView.swift in Sources */,
 				D0059B302D282F0500B3D100 /* CalendarView.swift in Sources */,
@@ -687,6 +736,7 @@
 				D0059B282D282EB100B3D100 /* HomeView.swift in Sources */,
 				D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */,
 				D0CF02AC2D0F315900D0B15C /* ImagePickerView.swift in Sources */,
+				D0F5F1EE2D32F177000D6611 /* MapPreviewComponent.swift in Sources */,
 				D0C4CBE42D0DBC070047EAA9 /* AuthUser.swift in Sources */,
 				D0CF027D2D0E531000D0B15C /* ViewModifiers.swift in Sources */,
 				D0F5F1E62D32B45C000D6611 /* ColorGenerator.swift in Sources */,
@@ -699,6 +749,7 @@
 				D039C6F32CF4BB83000F6ACE /* FirstLaunchView.swift in Sources */,
 				D0C4CBED2D0DC06B0047EAA9 /* AuthenticationView.swift in Sources */,
 				D0CF02792D0E4B8600D0B15C /* ProfilePictureView.swift in Sources */,
+				D0F5F1F02D32F1AD000D6611 /* BikesComponent.swift in Sources */,
 				D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */,
 				D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */,
 				D0CBC0992D0A4E80007513ED /* PageIndicator.swift in Sources */,
@@ -708,6 +759,7 @@
 				D0B5932A2C20E4400026D977 /* SplashScreenView.swift in Sources */,
 				D0F5F1E82D32B89D000D6611 /* ProfileInitialsView.swift in Sources */,
 				D0C4CBEF2D0DC0A80047EAA9 /* EmailAuthView.swift in Sources */,
+				D0F5F1FA2D32F257000D6611 /* LocationManager.swift in Sources */,
 				D0CF02B12D0F31D700D0B15C /* ImagePickerModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
