@@ -3,6 +3,7 @@
 //  CycleMate
 //
 
+import SwiftUI
 import Foundation
 
 /// An enumeration representing the different authentication providers.
@@ -40,10 +41,11 @@ struct AuthUser {
     /// A flag indicating if the user's profile is completed.
     var isProfileCompleted: Bool
     
+    /// The background color for the user's profile when no image is set
+    var backgroundColor: Color?
+    
     /// A computed property that returns the user's full name.
     var fullName: String {
         return [firstName, lastName].compactMap { $0 }.joined(separator: " ")
     }
 }
-
-// End of file. No additional code.

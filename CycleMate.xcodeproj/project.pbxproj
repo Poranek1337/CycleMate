@@ -60,6 +60,9 @@
 		D0CF02AC2D0F315900D0B15C /* ImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF02AB2D0F315500D0B15C /* ImagePickerView.swift */; };
 		D0CF02AE2D0F316300D0B15C /* ImageCropperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF02AD2D0F316000D0B15C /* ImageCropperView.swift */; };
 		D0CF02B12D0F31D700D0B15C /* ImagePickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CF02B02D0F31D300D0B15C /* ImagePickerModel.swift */; };
+		D0F5F1E62D32B45C000D6611 /* ColorGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1E52D32B458000D6611 /* ColorGenerator.swift */; };
+		D0F5F1E82D32B89D000D6611 /* ProfileInitialsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1E72D32B89A000D6611 /* ProfileInitialsView.swift */; };
+		D0F5F1EB2D32E270000D6611 /* ProfileImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0F5F1EA2D32E26A000D6611 /* ProfileImageManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +124,9 @@
 		D0CF02AB2D0F315500D0B15C /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
 		D0CF02AD2D0F316000D0B15C /* ImageCropperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperView.swift; sourceTree = "<group>"; };
 		D0CF02B02D0F31D300D0B15C /* ImagePickerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerModel.swift; sourceTree = "<group>"; };
+		D0F5F1E52D32B458000D6611 /* ColorGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorGenerator.swift; sourceTree = "<group>"; };
+		D0F5F1E72D32B89A000D6611 /* ProfileInitialsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInitialsView.swift; sourceTree = "<group>"; };
+		D0F5F1EA2D32E26A000D6611 /* ProfileImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -373,6 +379,7 @@
 		D0C4CBDF2D0DBBB60047EAA9 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				D0F5F1E42D32B433000D6611 /* Utils */,
 				D0C4CBE12D0DBBC80047EAA9 /* ViewModel */,
 				D0C4CBE02D0DBBBF0047EAA9 /* Views */,
 			);
@@ -438,6 +445,7 @@
 		D0CBC0BC2D0BA082007513ED /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D0F5F1E92D32E264000D6611 /* ProfileImage */,
 				D0C4CBE52D0DBC520047EAA9 /* Auth */,
 			);
 			path = Services;
@@ -502,6 +510,7 @@
 		D0CF02AA2D0F314600D0B15C /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				D0F5F1E72D32B89A000D6611 /* ProfileInitialsView.swift */,
 				D0CF02AD2D0F316000D0B15C /* ImageCropperView.swift */,
 				D0CF02AB2D0F315500D0B15C /* ImagePickerView.swift */,
 			);
@@ -514,6 +523,22 @@
 				D0CF02B02D0F31D300D0B15C /* ImagePickerModel.swift */,
 			);
 			path = PickerModel;
+			sourceTree = "<group>";
+		};
+		D0F5F1E42D32B433000D6611 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				D0F5F1E52D32B458000D6611 /* ColorGenerator.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		D0F5F1E92D32E264000D6611 /* ProfileImage */ = {
+			isa = PBXGroup;
+			children = (
+				D0F5F1EA2D32E26A000D6611 /* ProfileImageManager.swift */,
+			);
+			path = ProfileImage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -664,6 +689,8 @@
 				D0CF02AC2D0F315900D0B15C /* ImagePickerView.swift in Sources */,
 				D0C4CBE42D0DBC070047EAA9 /* AuthUser.swift in Sources */,
 				D0CF027D2D0E531000D0B15C /* ViewModifiers.swift in Sources */,
+				D0F5F1E62D32B45C000D6611 /* ColorGenerator.swift in Sources */,
+				D0F5F1EB2D32E270000D6611 /* ProfileImageManager.swift in Sources */,
 				D0059B2C2D282EDB00B3D100 /* MapView.swift in Sources */,
 				D0C4CBE72D0DBC780047EAA9 /* AuthenticationManager.swift in Sources */,
 				D0B592FA2C20E3390026D977 /* CycleMateApp.swift in Sources */,
@@ -679,6 +706,7 @@
 				D0059B242D282E0C00B3D100 /* CustomTabBar.swift in Sources */,
 				D0CBC09E2D0A4F6C007513ED /* FirstLaunchViewModel.swift in Sources */,
 				D0B5932A2C20E4400026D977 /* SplashScreenView.swift in Sources */,
+				D0F5F1E82D32B89D000D6611 /* ProfileInitialsView.swift in Sources */,
 				D0C4CBEF2D0DC0A80047EAA9 /* EmailAuthView.swift in Sources */,
 				D0CF02B12D0F31D700D0B15C /* ImagePickerModel.swift in Sources */,
 			);

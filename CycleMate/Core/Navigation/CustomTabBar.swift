@@ -103,35 +103,44 @@ struct CustomTabBar: View {
             .zIndex(2)
         } else {
             // Portrait layout
-            VStack {
+            VStack(spacing: 0) {
                 Spacer()
-                ZStack(alignment: .leading) {
-                    Circle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(width: 50, height: 50)
-                        .offset(x: selectedTabOffset)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedTab)
+                // Add blur background
+                ZStack {
+                    // Blur background
+                    Rectangle()
+                        .fill(.clear)
+                        .background(.ultraThinMaterial)
+                        .frame(height: 85)
                     
-                    HStack(spacing: 0) {
-                        ForEach(Tab.allCases, id: \.self) { tab in
-                            Button {
-                                if !isDragging {
-                                    selectedTab = tab
-                                    print("Selected tab: \(tab)")
+                    // Tab content
+                    ZStack(alignment: .leading) {
+                        Circle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 50, height: 50)
+                            .offset(x: selectedTabOffset)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedTab)
+                        
+                        HStack(spacing: 0) {
+                            ForEach(Tab.allCases, id: \.self) { tab in
+                                Button {
+                                    if !isDragging {
+                                        selectedTab = tab
+                                        print("Selected tab: \(tab)")
+                                    }
+                                } label: {
+                                    Image(systemName: tab.icon)
+                                        .font(.system(size: 24))
+                                        .foregroundColor(selectedTab == tab ? selectedColor : unselectedColor)
+                                        .frame(maxWidth: .infinity)
                                 }
-                            } label: {
-                                Image(systemName: tab.icon)
-                                    .font(.system(size: 24))
-                                    .foregroundColor(selectedTab == tab ? selectedColor : unselectedColor)
-                                    .frame(maxWidth: .infinity)
+                                .buttonStyle(BorderlessButtonStyle())
                             }
-                            .buttonStyle(BorderlessButtonStyle())
                         }
                     }
+                    .frame(height: 60)
+                    .padding(.vertical, 10)
                 }
-                .frame(height: 60)
-                .padding(.vertical, 20)
-                .background(colorScheme == .dark ? Color.black.opacity(0.8) : Color.white.opacity(0.8))
             }
         }
     }

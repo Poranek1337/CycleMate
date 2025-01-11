@@ -9,6 +9,9 @@ struct HomeView: View {
     // Add AuthViewModel
     @EnvironmentObject private var authViewModel: AuthViewModel
     
+    // Add state to track image loading
+    @State private var isCheckingImage = false
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
@@ -24,26 +27,35 @@ struct HomeView: View {
                     
                     Spacer()
                     
-                    // Profile Picture
-                    if let photoURL = authViewModel.currentUser?.photoURL, !photoURL.isEmpty {
-                        AsyncImage(url: URL(string: photoURL)) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 50, height: 50)
-                                .clipShape(Circle())
-                        } placeholder: {
-                            Circle()
-                                .frame(width: 50, height: 50)
-                                .foregroundColor(.gray)
+                    // Update Profile Picture section
+                    if let user = authViewModel.currentUser {
+                        if !user.photoURL.isEmpty {
+                            if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: user.id) {
+                                Image(uiImage: localImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 50, height: 50)
+                                    .clipShape(Circle())
+                            } else {
+                                AsyncImage(url: URL(string: user.photoURL)) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 50, height: 50)
+                                        .clipShape(Circle())
+                                } placeholder: {
+                                    ProfileInitialsView(user: user)
+                                }
+                            }
+                        } else {
+                            ProfileInitialsView(user: user)
                         }
                     } else {
-                        Circle()
-                            .frame(width: 50, height: 50)
-                            .foregroundColor(.gray)
+                        ProfileInitialsView(user: nil)
                     }
                 }
                 .padding()
+                .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top)
                 
                 // Map Preview Section
                 VStack(alignment: .leading, spacing: 8) {
@@ -151,8 +163,17 @@ struct HomeView: View {
                 .cornerRadius(20)
                 .padding(.horizontal)
             }
+            .padding(.bottom, 80)
         }
-        .scrollContentBackground(.hidden)
+        .edgesIgnoringSafeArea(.top)
+        .task {
+            await authViewModel.fetchUser()
+            if !isCheckingImage {
+                isCheckingImage = true
+                try? await AuthenticationManager.shared.checkAndUpdateProfileImage()
+                isCheckingImage = false
+            }
+        }
     }
 }
 

@@ -35,7 +35,10 @@ class AuthViewModel: ObservableObject {
     
     /// The user's profile image.
     @Published var userProfileImage: UIImage?
-
+    
+    /// The user's background color.
+    @Published var userBackgroundColor: Color?
+    
     // Email auth properties
     @Published var email = ""
     @Published var password = ""
@@ -91,7 +94,13 @@ class AuthViewModel: ObservableObject {
     func fetchUser() async {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         guard let snapshot = try? await Firestore.firestore().collection("users").document(uid).getDocument() else { return }
-        self.currentUser = try? snapshot.data(as: User.self)
+        
+        if let user = try? snapshot.data(as: User.self) {
+            self.currentUser = user
+            if let colorComponents = user.backgroundColor {
+                self.userBackgroundColor = colorComponents.color
+            }
+        }
     }
 
     // MARK: - Email Authentication Methods
@@ -118,13 +127,17 @@ class AuthViewModel: ObservableObject {
         print("🔄 Creating verified user account...")
         let result = try await Auth.auth().signIn(withEmail: email, password: password)
         let firebaseId = result.user.uid
-        print("✅ Signed in verified user: \(firebaseId)")
         
         guard result.user.isEmailVerified else {
             print("❌ User email is not verified")
             throw AuthError.signInFailed
         }
         
+        // Generate profile color and convert to components
+        let profileColor = ColorGenerator.generateProfileColor()
+        let colorComponents = ColorGenerator.colorToComponents(profileColor)
+        
+        // Update userData to include background color
         let userData: [String: Any] = [
             "id": firebaseId,
             "firstName": firstName,
@@ -134,33 +147,33 @@ class AuthViewModel: ObservableObject {
             "photoURL": "",
             "createdAt": FieldValue.serverTimestamp(),
             "provider": "email",
-            "isProfileCompleted": false
+            "isProfileCompleted": false,
+            "backgroundColor": [
+                "red": colorComponents.red,
+                "green": colorComponents.green,
+                "blue": colorComponents.blue
+            ]
         ]
         
-        do {
-            try await Firestore.firestore().collection("users").document(firebaseId).setData(userData)
-            print("✅ Created user data in Firestore: \(firstName) \(lastName)")
-            
-            self.currentUser = User(
-                id: firebaseId,
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                photoURL: "",
-                createdAt: Date(),
-                dateOfBirth: dateOfBirth,
-                provider: "email",
-                isProfileCompleted: false
-            )
-            
-            self.userSession = result.user
-            self.showUserDataForm = false
-            print("✅ View model state updated, ready for profile picture")
-            
-        } catch {
-            print("❌ Failed to create user document: \(error)")
-            throw AuthError.profileUpdateFailed
-        }
+        try await Firestore.firestore().collection("users").document(firebaseId).setData(userData)
+        
+        // Update currentUser with the new color components
+        self.currentUser = User(
+            id: firebaseId,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            photoURL: "",
+            createdAt: Date(),
+            dateOfBirth: dateOfBirth,
+            provider: "email",
+            isProfileCompleted: false,
+            backgroundColor: colorComponents
+        )
+        
+        self.userSession = result.user
+        self.userBackgroundColor = profileColor
+        self.showUserDataForm = false
     }
 
     func signInWithEmail() async {
@@ -234,7 +247,7 @@ class AuthViewModel: ObservableObject {
             showError = true
         }
     }
-
+    
     func updateProfileImage(image: UIImage) async {
         do {
             userProfileImage = image
@@ -280,10 +293,36 @@ class AuthViewModel: ObservableObject {
         userProfileImage = nil
     }
 
+    /// Updates the user background color.
+    func updateUserBackgroundColor() {
+        if let user = currentUser,
+           let colorComponents = user.backgroundColor {
+            self.userBackgroundColor = colorComponents.color
+        }
+    }
+
     /// Enumeration of possible authentication errors.
     enum AuthError: Error {
         case signInFailed
         case userNotFound
         case profileUpdateFailed
+    }
+}
+
+extension UIColor {
+    func encode() -> [CGFloat] {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        
+        getRed(&red, green: &green, blue: &blue, alpha: nil)
+        return [red, green, blue]
+    }
+    
+    static func decode(_ components: [CGFloat]) -> UIColor {
+        return UIColor(red: components[0],
+                       green: components[1],
+                       blue: components[2],
+                       alpha: 1.0)
     }
 }

@@ -10,6 +10,7 @@ import FirebaseFirestore
 import FirebaseStorage
 import GoogleSignIn
 import SwiftUI
+import CryptoKit
 
 /// Manages authentication and user sessions.
 @MainActor
@@ -238,7 +239,6 @@ class AuthenticationManager: ObservableObject {
         self.needsProfileCompletion = !isProfileCompleted
     }
     
-    // Rest of profile management methods remain the same
     func updateUserProfile(firstName: String, lastName: String, dateOfBirth: Date) async throws {
         print("👤 Updating user profile")
         
@@ -258,6 +258,10 @@ class AuthenticationManager: ObservableObject {
         let authResult = try await Auth.auth().signIn(with: credential)
         let firebaseId = authResult.user.uid
         
+        // Generate profile color and convert to components
+        let profileColor = ColorGenerator.generateProfileColor()
+        let colorComponents = ColorGenerator.colorToComponents(profileColor)
+        
         // Create user document in Firestore
         let userData: [String: Any] = [
             "id": authResult.user.uid,
@@ -268,7 +272,12 @@ class AuthenticationManager: ObservableObject {
             "photoURL": "",
             "createdAt": FieldValue.serverTimestamp(),
             "provider": "google",
-            "isProfileCompleted": true
+            "isProfileCompleted": true,
+            "backgroundColor": [
+                "red": colorComponents.red,
+                "green": colorComponents.green,
+                "blue": colorComponents.blue
+            ]
         ]
         
         try await db.collection("users").document(authResult.user.uid).setData(userData)
@@ -283,7 +292,8 @@ class AuthenticationManager: ObservableObject {
             createdAt: Date(),
             dateOfBirth: dateOfBirth,
             provider: .google,
-            isProfileCompleted: true
+            isProfileCompleted: true,
+            backgroundColor: profileColor
         )
         
         self.currentUser = updatedUser
@@ -295,6 +305,7 @@ class AuthenticationManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "google_access_token")
     }
     
+    // Rest of profile management methods remain the same
     // MARK: - Profile Image Management
     func uploadProfileImage(_ image: UIImage) async throws {
         // First verify current user exists
@@ -341,6 +352,43 @@ class AuthenticationManager: ObservableObject {
         } catch {
             print("❌ Profile image upload failed with error: \(error)")
             throw AuthError.imageUploadFailed
+        }
+    }
+    
+    func checkAndUpdateProfileImage() async throws {
+        guard let currentUser = currentUser,
+              let photoURL = currentUser.photoURL,
+              let url = URL(string: photoURL) else { return }
+        
+        let maxRetries = 3
+        var currentRetry = 0
+        
+        while currentRetry < maxRetries {
+            do {
+                let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
+                let (data, _) = try await URLSession.shared.data(for: request)
+                
+                guard let remoteImage = UIImage(data: data) else { return }
+                
+                if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: currentUser.id) {
+                    if !ProfileImageManager.shared.areImagesEqual(localImage: localImage, remoteImage: remoteImage) {
+                        let _ = try ProfileImageManager.shared.saveImageLocally(remoteImage, forUserId: currentUser.id)
+                    }
+                } else {
+                    let _ = try ProfileImageManager.shared.saveImageLocally(remoteImage, forUserId: currentUser.id)
+                }
+                
+                return
+            } catch let error as NSError {
+                if error.domain == NSURLErrorDomain && error.code == NSURLErrorCancelled {
+                    currentRetry += 1
+                    if currentRetry < maxRetries {
+                        try await Task.sleep(for: .seconds(1))
+                        continue
+                    }
+                }
+                throw error
+            }
         }
     }
     

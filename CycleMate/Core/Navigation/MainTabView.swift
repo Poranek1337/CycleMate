@@ -187,4 +187,5 @@ extension View {
 // Preview
 #Preview {
     MainTabView()
+        .environmentObject(AuthViewModel())
 }

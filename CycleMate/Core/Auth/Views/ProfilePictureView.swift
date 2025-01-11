@@ -17,6 +17,7 @@ struct ProfilePictureView: View {
     @State private var showPhotoOptions = false
     @State private var offset: CGFloat = UIScreen.main.bounds.height
     @State private var showMainView = false
+    @State private var profileColor: Color = ColorGenerator.generateProfileColor()
     
     // MARK: - Computed properties remain the same
     private var hasSelectedImage: Bool {
@@ -72,7 +73,7 @@ struct ProfilePictureView: View {
                         .opacity(animateContent ? 1 : 0)
                         .offset(y: animateContent ? 0 : 20)
                         
-                        // Profile image circle remains the same
+                        // Profile image circle
                         ZStack {
                             Circle()
                                 .fill(Color.gray.opacity(0.1))
@@ -85,9 +86,13 @@ struct ProfilePictureView: View {
                                     .frame(width: 200, height: 200)
                                     .clipShape(Circle())
                             } else {
-                                Image(systemName: "person.fill")
-                                    .font(.system(size: 80))
-                                    .foregroundColor(.gray)
+                                Circle()
+                                    .fill(viewModel.userBackgroundColor ?? .gray)
+                                    .frame(width: 200, height: 200)
+                                
+                                Text(ColorGenerator.generateInitials(firstName: viewModel.firstName, lastName: viewModel.lastName))
+                                    .font(.system(size: 80, weight: .bold))
+                                    .foregroundColor(.white)
                             }
                         }
                         .padding(.vertical, 40)
@@ -114,17 +119,12 @@ struct ProfilePictureView: View {
                             }
                             
                             Button {
-                                print(" Continue/Maybe later button tapped")
                                 Task {
                                     if hasSelectedImage {
-                                        print(" Uploading profile image...")
                                         await viewModel.updateProfileImage(image: viewModel.userProfileImage!)
-                                        print(" Profile image upload completed")
-                                        print(" Error state: \(viewModel.showError)")
                                     }
                                     
                                     if !viewModel.showError {
-                                        print(" Setting showMainView to true")
                                         showMainView = true
                                     }
                                 }
@@ -266,12 +266,18 @@ struct ProfilePictureView: View {
             }
             .onAppear {
                 print(" View appeared")
+                // Disable checksum verification when entering profile picture view
+                ProfileImageManager.shared.setChecksumVerification(enabled: false)
                 withAnimation(.easeOut(duration: 0.8)) {
                     animateContent = true
                 }
+                if !hasSelectedImage && viewModel.userBackgroundColor == nil {
+                    viewModel.userBackgroundColor = ColorGenerator.generateProfileColor()
+                }
             }
-            .onChange(of: showMainView) { newValue in
-                print(" showMainView changed to: \(newValue)")
+            .onDisappear {
+                // Re-enable checksum verification when leaving profile picture view
+                ProfileImageManager.shared.setChecksumVerification(enabled: true)
             }
         }
         .navigationViewStyle(.stack)
