@@ -58,6 +58,7 @@ class FirstLaunchViewModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                 self.currentPage += 1
+                self.currentPage = min(self.currentPage, self.totalPages - 1)
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
