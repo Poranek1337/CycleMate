@@ -169,7 +169,7 @@ struct EmailLoginView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity)
-            .frame(height: UIScreen.main.bounds.height / 2.2)
+            .frame(height: UIScreen.main.bounds.height / 2.0)
             .background(Color(.systemBackground))
             .cornerRadius(25, corners: [.topLeft, .topRight])
             .offset(y: offset)
