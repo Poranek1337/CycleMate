@@ -41,20 +41,20 @@ struct MapPreviewComponent: View {
             .cornerRadius(20)
             
             // Conditional blur overlay
-            if !locationManager.isLocationEnabled || !locationManager.isAuthorized {
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .cornerRadius(20)
-                    .overlay(
-                        Button(action: { locationManager.requestAuthorization() }) {
-                            Text("Enable Location Services")
-                                .padding()
-                                .background(.ultraThinMaterial)
-                                .foregroundColor(.primary)
-                                .cornerRadius(20)
-                        }
-                    )
-            }
+//            if !locationManager.isLocationEnabled || !locationManager.isAuthorized {
+//                Rectangle()
+//                    .fill(.ultraThinMaterial)
+//                    .cornerRadius(20)
+//                    .overlay(
+//                        Button(action: { locationManager.requestAuthorization() }) {
+//                            Text("Enable Location Services")
+//                                .padding()
+//                                .background(.ultraThinMaterial)
+//                                .foregroundColor(.primary)
+//                                .cornerRadius(20)
+//                        }
+//                    )
+//            }
         }
         .padding(.horizontal)
     }
