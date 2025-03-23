@@ -9,6 +9,7 @@ import SwiftUI
 /// A view that manages the main tab navigation and handles device orientation changes.
 struct MainTabView: View {
     // MARK: - Properties
+    @EnvironmentObject var authViewModel: AuthViewModel
     @State private var selectedTab: Tab = .home
     @State private var deviceOrientation: UIDeviceOrientation = .unknown
     @State private var isTabBarVisible = true
@@ -39,17 +40,20 @@ struct MainTabView: View {
             ZStack(alignment: effectiveOrientation.isLandscape ? .leading : .bottom) {
                 // Main TabView with pages
                 TabView(selection: $selectedTab) {
-                    HomeView()
-                        .tag(Tab.home)
-                        .ignoresSafeArea()
-                    
-                    MapView()
-                        .tag(Tab.map)
-                        .ignoresSafeArea()
-                    
-                    CalendarView()
-                        .tag(Tab.calendar)
-                        .ignoresSafeArea()
+                    Group {
+                        HomeView()
+                            .tag(Tab.home)
+                            .ignoresSafeArea()
+                        
+                        MapView()
+                            .tag(Tab.map)
+                            .ignoresSafeArea()
+                        
+                        CalendarView()
+                            .tag(Tab.calendar)
+                            .ignoresSafeArea()
+                    }
+                    .environmentObject(authViewModel)  // Add this to ensure all tab views get the environment object
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 // Remove animation from TabView to prevent unwanted transitions

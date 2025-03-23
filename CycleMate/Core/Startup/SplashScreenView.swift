@@ -22,6 +22,7 @@ struct SplashScreenView: View {
                     // User has an active session, show MainTabView
                     MainTabView()
                         .background(Color.clear)
+                        .environmentObject(authViewModel)
                 } else {
                     // No active session, show FirstLaunchView
                     FirstLaunchView()

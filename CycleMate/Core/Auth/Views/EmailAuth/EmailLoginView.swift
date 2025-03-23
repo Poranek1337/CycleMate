@@ -1,9 +1,3 @@
-//
-//  EmailLoginView.swift
-//  CycleMate
-//  dev.Poranek
-//
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -13,7 +7,7 @@ struct EmailLoginView: View {
     // MARK: - Properties
     
     /// The view model for authentication.
-    @StateObject private var viewModel = AuthViewModel()
+    @EnvironmentObject private var viewModel: AuthViewModel
     
     /// A binding to determine if the view is presented.
     @Binding var isPresented: Bool
@@ -122,7 +116,6 @@ struct EmailLoginView: View {
                             .foregroundColor(Color("second"))
                             .font(.subheadline)
                     }
-
                     .padding(.top, 2)
                     
                     // Create account section
@@ -219,7 +212,6 @@ struct EmailLoginView: View {
         .onDisappear {
             NotificationCenter.default.removeObserver(self)
         }
-        
         .alert("Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -234,10 +226,6 @@ struct EmailLoginView: View {
         .onChange(of: viewModel.userSession) { newValue in
             if newValue != nil {
                 dismissCard()
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let window = windowScene.windows.first {
-                    window.rootViewController = UIHostingController(rootView: MainTabView())
-                }
             }
         }
     }
@@ -263,4 +251,5 @@ struct EmailLoginView: View {
 // Preview
 #Preview {
     EmailLoginView(isPresented: .constant(true))
+        .environmentObject(AuthViewModel())
 }

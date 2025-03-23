@@ -6,10 +6,9 @@
 import SwiftUI
 
 struct HomeView: View {
-    // Properties remain the same
     @EnvironmentObject private var authViewModel: AuthViewModel
     @State private var isCheckingImage = false
-    
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
