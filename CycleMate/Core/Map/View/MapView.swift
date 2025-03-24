@@ -114,8 +114,9 @@ struct MapViewRepresentable: UIViewRepresentable {
         
         mapView.showsUserLocation = true
         mapView.showsUserHeadingIndicator = true
-        mapView.minimumZoomLevel = 16
+        mapView.minimumZoomLevel = 1
         mapView.maximumZoomLevel = 20
+        mapView.setZoomLevel(10, animated: true)
         
         mapView.logoView.isHidden = true
         mapView.compassView.isHidden = true
@@ -137,32 +138,17 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: MLNMapView, context: Context) {
-        uiView.styleURL = URL(string: styleURL)
-        
-        if let location = userLocation {
-            let heading = userCourse > 0 ? userCourse : userHeading
-            
-            if isTrackingUser {
-                if !context.coordinator.isAnimatingToUserLocation {
-                    context.coordinator.isAnimatingToUserLocation = true
-                    
-                    UIView.animate(withDuration: 0.5) {
-                        uiView.setUserTrackingMode(.followWithHeading, animated: true)
-                        
-                        let camera = MLNMapCamera(
-                            lookingAtCenter: location,
-                            altitude: cameraAltitude,
-                            pitch: 45,
-                            heading: heading
-                        )
-                        uiView.setCamera(camera, animated: true)
-                    } completion: { _ in
-                        context.coordinator.isAnimatingToUserLocation = false
-                    }
-                }
-            } else {
-                uiView.setUserTrackingMode(.none, animated: true)
-            }
+        if isTrackingUser, let location = userLocation {
+            uiView.setUserTrackingMode(.followWithHeading, animated: false) {}
+            let camera = MLNMapCamera(
+                lookingAtCenter: location,
+                altitude: cameraAltitude,
+                pitch: 45,
+                heading: userCourse > 0 ? userCourse : userHeading
+            )
+            uiView.setCamera(camera, animated: false)
+        } else {
+            uiView.setUserTrackingMode(.none, animated: true) {}
         }
     }
     
@@ -184,7 +170,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         func mapView(_ mapView: MLNMapView, regionWillChangeWith reason: MLNCameraChangeReason, animated: Bool) {
             if reason == .gesturePan || reason == .gesturePinch || reason == .gestureRotate || reason == .gestureTilt {
                 isGestureInProgress = true
-                mapView.setUserTrackingMode(.none, animated: false)
+                mapView.setUserTrackingMode(.none, animated: false) {}
                 onMapInteraction()
             }
         }
@@ -198,6 +184,19 @@ struct MapViewRepresentable: UIViewRepresentable {
         
         func mapViewDidFailLoadingMap(_ mapView: MLNMapView, withError error: Error) {
             print("Map loading failed: \(error.localizedDescription)")
+        }
+        
+        func mapViewDidFinishLoadingMap(_ mapView: MLNMapView) {
+            print("Map finished loading")
+            if let location = mapView.userLocation?.coordinate {
+                let camera = MLNMapCamera(
+                    lookingAtCenter: location,
+                    altitude: 800,
+                    pitch: 45,
+                    heading: 0
+                )
+                mapView.setCamera(camera, animated: false)
+            }
         }
     }
 }
