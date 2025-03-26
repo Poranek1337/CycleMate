@@ -774,6 +774,7 @@
 				D0CBC09E2D0A4F6C007513ED /* FirstLaunchViewModel.swift in Sources */,
 				D0B5932A2C20E4400026D977 /* SplashScreenView.swift in Sources */,
 				D0F5F1E82D32B89D000D6611 /* ProfileInitialsView.swift in Sources */,
+				D0C4CBEF2D0DC0A80047EAA9 /* EmailAuthView.swift in Sources */,
 				D0CF02B12D0F31D700D0B15C /* ImagePickerModel.swift in Sources */,
 				D0F5F2362D333836000D6611 /* LocationManager.swift in Sources */,
 			);
