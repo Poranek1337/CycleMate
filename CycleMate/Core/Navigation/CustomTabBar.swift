@@ -57,9 +57,8 @@ struct CustomTabBar: View {
     
     var body: some View {
         if isLandscape {
-            // Vertical layout for landscape
             GeometryReader { geometry in
-                let tabWidth: CGFloat = 52
+                let tabWidth: CGFloat = 42
                 let edgeDistance: CGFloat = tabWidth / 2
                 
                 VStack(spacing: 15) {
@@ -102,18 +101,14 @@ struct CustomTabBar: View {
             }
             .zIndex(2)
         } else {
-            // Portrait layout
             VStack(spacing: 0) {
                 Spacer()
-                // Add blur background
                 ZStack {
-                    // Blur background
                     Rectangle()
                         .fill(.clear)
                         .background(.ultraThinMaterial)
                         .frame(height: 85)
                     
-                    // Tab content
                     ZStack(alignment: .leading) {
                         Circle()
                             .fill(Color.gray.opacity(0.2))
@@ -145,9 +140,6 @@ struct CustomTabBar: View {
         }
     }
     
-    // Helper computed property for tab offset
-    
-    /// The offset for the selected tab indicator.
     private var selectedTabOffset: CGFloat {
         let tabWidth = UIScreen.main.bounds.width / CGFloat(Tab.allCases.count)
         if let index = Tab.allCases.firstIndex(of: selectedTab) {
@@ -156,8 +148,6 @@ struct CustomTabBar: View {
         return 0
     }
 }
-
-// Preview
 #Preview {
     CustomTabBar(
         selectedTab: .constant(.home),
@@ -166,4 +156,3 @@ struct CustomTabBar: View {
     )
 }
 
-// End of file

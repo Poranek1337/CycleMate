@@ -2,22 +2,29 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>MapTilerAPIKey</key>
-	<string>M1hI8n4C5dZTR5iqcPZK</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>CycleMate needs your location to show your position on the map and track your cycling routes.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>CycleMate needs your location to show your position on the map, track your cycling routes, and provide navigation even when the app is in the background.</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.884855087864-hmpbnrcdnlenh8aehnb23hfvrthhg5pe</string>
-			</array>
-		</dict>
-	</array>
+    <key>CFBundleIdentifier</key>
+    <string></string>
+    <key>MapTilerAPIKey</key>
+    <string>M1hI8n4C5dZTR5iqcPZK</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>CycleMate needs your location to show your position on the map and track your cycling routes.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>CycleMate needs your location to show your position on the map, track your cycling routes, and provide navigation even when the app is in the background.</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.884855087864-hmpbnrcdnlenh8aehnb23hfvrthhg5pe</string>
+            </array>
+        </dict>
+    </array>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>fetch</string>
+    </array>
 </dict>
 </plist>

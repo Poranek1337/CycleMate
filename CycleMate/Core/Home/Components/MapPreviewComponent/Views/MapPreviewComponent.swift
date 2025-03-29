@@ -13,7 +13,6 @@ struct MapPreviewComponent: View {
     
     var body: some View {
         ZStack {
-            // Base content regardless of permission status
             VStack(alignment: .leading, spacing: 8) {
                 Text("Graham Ave")
                     .bold()
@@ -39,22 +38,6 @@ struct MapPreviewComponent: View {
             .padding()
             .background(Color.blue.opacity(0.1))
             .cornerRadius(20)
-            
-            // Conditional blur overlay
-//            if !locationManager.isLocationEnabled || !locationManager.isAuthorized {
-//                Rectangle()
-//                    .fill(.ultraThinMaterial)
-//                    .cornerRadius(20)
-//                    .overlay(
-//                        Button(action: { locationManager.requestAuthorization() }) {
-//                            Text("Enable Location Services")
-//                                .padding()
-//                                .background(.ultraThinMaterial)
-//                                .foregroundColor(.primary)
-//                                .cornerRadius(20)
-//                        }
-//                    )
-//            }
         }
         .padding(.horizontal)
     }

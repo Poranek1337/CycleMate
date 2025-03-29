@@ -9,7 +9,7 @@ import MapLibre
 class LocationManager: NSObject, ObservableObject {
     // MARK: - Properties
     private let locationManager = CLLocationManager()
-    private var lastLocation: CLLocation?
+    @Published var lastLocation: CLLocation?
     private var lastUpdateTime: Date = Date()
     
     @Published var userLocation: CLLocationCoordinate2D?
@@ -32,7 +32,11 @@ class LocationManager: NSObject, ObservableObject {
     // MARK: - Private Methods
     private func checkLocationAuthorization() {
         switch locationManager.authorizationStatus {
-        case .authorizedWhenInUse, .authorizedAlways:
+        case .authorizedWhenInUse:
+            hasLocationPermission = true
+            locationManager.requestAlwaysAuthorization()
+            startUpdatingLocation()
+        case .authorizedAlways:
             hasLocationPermission = true
             startUpdatingLocation()
         case .notDetermined:

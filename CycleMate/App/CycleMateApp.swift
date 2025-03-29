@@ -39,10 +39,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
         
         // Configure Firestore settings
-        let settings = Firestore.firestore().settings
-        settings.isPersistenceEnabled = true
-        settings.cacheSizeBytes = FirestoreCacheSizeUnlimited
-        Firestore.firestore().settings = settings
+        let db = Firestore.firestore()
+        let settings = FirestoreSettings()
+        db.settings = settings
         
         print("✅ Firebase configured")
         return true
@@ -59,11 +58,8 @@ struct CycleMateApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                SplashScreenView()
-                    .environmentObject(authViewModel)
-            }
-            .environmentObject(authViewModel)
+            SplashScreenView()
+                .environmentObject(authViewModel)
         }
     }
 }

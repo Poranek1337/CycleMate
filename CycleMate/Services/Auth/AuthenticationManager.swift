@@ -39,9 +39,9 @@ class AuthenticationManager: ObservableObject {
     
     /// Configures Firestore for offline persistence.
     private func configureFirestore() {
+        // CHANGE: Use the latest Firebase SDK settings
         let settings = FirestoreSettings()
-        settings.isPersistenceEnabled = true
-        settings.cacheSizeBytes = FirestoreCacheSizeUnlimited
+        // Note: Persistence is enabled by default in the latest Firebase SDK
         db.settings = settings
     }
     
@@ -49,7 +49,8 @@ class AuthenticationManager: ObservableObject {
     /// Sets up the authentication state listener.
     private func setupAuthStateListener() {
         print("🔄 Setting up auth state listener")
-        Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
+        // CHANGE: Store listener handle
+        let _ = Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
             if let user = user {
                 print("✅ Found user session for ID: \(user.uid)")
                 Task { [weak self] in
@@ -256,7 +257,6 @@ class AuthenticationManager: ObservableObject {
         
         // Now create Firebase account
         let authResult = try await Auth.auth().signIn(with: credential)
-        let firebaseId = authResult.user.uid
         
         // Generate profile color and convert to components
         let profileColor = ColorGenerator.generateProfileColor()
@@ -278,7 +278,7 @@ class AuthenticationManager: ObservableObject {
                 "green": colorComponents.green,
                 "blue": colorComponents.blue
             ]
-        ]
+        ] as [String: Any]  // CHANGE: Explicitly type the dictionary
         
         try await db.collection("users").document(authResult.user.uid).setData(userData)
         
@@ -340,10 +340,12 @@ class AuthenticationManager: ObservableObject {
             let url = try await imageRef.downloadURL()
             
             print("💾 Updating Firestore document...")
-            try await db.collection("users").document(currentFirebaseUser.uid).updateData([
+            let updateData: [String: Any] = [
                 "photoURL": url.absoluteString,
                 "isProfileCompleted": true
-            ])
+            ] as [String: Any]  // CHANGE: Explicitly type the dictionary
+            
+            try await db.collection("users").document(currentFirebaseUser.uid).updateData(updateData)
             
             // Update local user state
             print("🔄 Updating local user state...")

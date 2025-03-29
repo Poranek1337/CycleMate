@@ -9,6 +9,7 @@ import GoogleSignIn
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
+import Combine
 
 /// ViewModel responsible for handling authentication logic.
 @MainActor
@@ -52,6 +53,9 @@ class AuthViewModel: ObservableObject {
     
     /// The authentication manager.
     let authManager = AuthenticationManager.shared
+    
+    /// Private property for cancellables
+    private var cancellables = Set<AnyCancellable>()
 
     /// Initializes a new instance of `AuthViewModel`.
     init() {
@@ -77,6 +81,8 @@ class AuthViewModel: ObservableObject {
                 }
             }
         }
+        .store(in: &cancellables)
+
     }
 
     /// Updates the user state based on the current authentication state.

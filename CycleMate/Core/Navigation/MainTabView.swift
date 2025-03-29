@@ -43,22 +43,17 @@ struct MainTabView: View {
                     Group {
                         HomeView()
                             .tag(Tab.home)
-                            .ignoresSafeArea()
                         
                         MapView()
                             .tag(Tab.map)
-                            .ignoresSafeArea()
                         
                         CalendarView()
                             .tag(Tab.calendar)
-                            .ignoresSafeArea()
                     }
-                    .environmentObject(authViewModel)  // Add this to ensure all tab views get the environment object
+                    .environmentObject(authViewModel)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                // Remove animation from TabView to prevent unwanted transitions
                 .animation(nil, value: selectedTab)
-                .ignoresSafeArea()
                 .onChange(of: selectedTab) { oldValue, newValue in
                     if !isDragging {
                         hapticFeedback.impactOccurred()
@@ -66,7 +61,6 @@ struct MainTabView: View {
                         print("Changed to view: \(newValue)")
                     }
                 }
-                // Add gesture only in portrait mode
                 .simultaneousGesture(
                     DragGesture()
                         .onChanged { _ in
@@ -79,7 +73,6 @@ struct MainTabView: View {
                     including: effectiveOrientation.isLandscape ? .subviews : .all
                 )
                 
-                // Custom TabBar with conditional rendering based on orientation
                 if effectiveOrientation.isLandscape {
                     CustomTabBar(
                         selectedTab: $selectedTab,
@@ -98,7 +91,6 @@ struct MainTabView: View {
                     )
                 }
             }
-            // Add background tap gesture
             .contentShape(Rectangle())
             .onTapGesture {
                 if effectiveOrientation.isLandscape {
@@ -123,7 +115,6 @@ struct MainTabView: View {
             }
         }
         .onAppear {
-            // Set initial orientation and start timer
             let currentOrientation = UIDevice.current.orientation
             if ![.portraitUpsideDown, .faceUp, .faceDown, .unknown].contains(currentOrientation) {
                 deviceOrientation = currentOrientation
@@ -137,7 +128,6 @@ struct MainTabView: View {
     
     // MARK: - Helper Functions
     
-    /// Updates the last interaction time and shows the tab bar if hidden.
     private func updateInteractionTime() {
         lastInteractionTime = Date()
         if !isTabBarVisible {

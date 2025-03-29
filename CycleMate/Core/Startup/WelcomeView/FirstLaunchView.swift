@@ -28,14 +28,13 @@ struct FirstLaunchView: View {
             if shouldShowMainTab {
                 MainTabView()
             } else {
-                // Wrap the onboarding content in a ZStack
                 ZStack {
                     onboardingContent
                 }
             }
         }
-        .onChange(of: authViewModel.currentUser) { user in
-            if user != nil {
+        .onChange(of: authViewModel.currentUser) { oldUser, newUser in
+            if newUser != nil {
                 print(" User authenticated, switching to MainTabView")
             }
         }
@@ -53,17 +52,13 @@ struct FirstLaunchView: View {
                     .transition(.opacity)
             }
             
-            // Semi-transparent overlay
             Color.black.opacity(0.4)
                 .edgesIgnoringSafeArea(.all)
             
-            // Content
             VStack(spacing: 30) {
                 Spacer()
                 
-                // Text content at the bottom
                 VStack(spacing: 20) {
-                    // Title with animated characters
                     HStack(spacing: 0) {
                         ForEach(Array(viewModel.slides[viewModel.currentPage].title.enumerated()), id: \.offset) { index, character in
                             Text(String(character))
@@ -77,7 +72,6 @@ struct FirstLaunchView: View {
                     }
                     .id("title_\(viewModel.currentPage)")
                     
-                    // Description with animated characters
                     HStack(spacing: 0) {
                         ForEach(Array(viewModel.slides[viewModel.currentPage].description.enumerated()), id: \.offset) { index, character in
                             Text(String(character))
@@ -93,7 +87,6 @@ struct FirstLaunchView: View {
                     .padding(.horizontal)
                 }
                 
-                // Page indicators
                 HStack(spacing: 8) {
                     ForEach(0..<viewModel.totalPages, id: \.self) { index in
                         Capsule()
@@ -104,7 +97,6 @@ struct FirstLaunchView: View {
                 }
                 .padding(.bottom, 10)
                 
-                // Navigation button
                 Button {
                     if viewModel.currentPage == viewModel.totalPages - 1 {
                         showAuthCard = true
@@ -124,7 +116,6 @@ struct FirstLaunchView: View {
                 .padding(.bottom, 50)
             }
             
-            // Auth card overlay with navigation callback
             if showAuthCard {
                 AuthenticationView(isPresented: $showAuthCard, onSuccessfulAuth: {
                     withAnimation {
@@ -141,7 +132,6 @@ struct FirstLaunchView: View {
     }
 }
 
-// Preview
 #Preview {
     FirstLaunchView()
         .environmentObject(AuthViewModel())

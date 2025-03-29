@@ -88,7 +88,6 @@ struct UserDataFormView: View {
                         .opacity(animateContent ? 1 : 0)
                         .offset(y: animateContent ? 0 : 20)
                         
-                        // Form fields with validation
                         VStack(spacing: 20) {
                             TextField("First name", text: $viewModel.firstName)
                                 .padding()
@@ -120,7 +119,6 @@ struct UserDataFormView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             
-                            // Date button
                             Button {
                                 withAnimation(.spring()) {
                                     showDatePicker.toggle()
@@ -158,16 +156,13 @@ struct UserDataFormView: View {
                     }
                 }
                 
-                // Bottom section with checkboxes and button
                 VStack(spacing: 15) {
-                    // Terms checkbox
                     Button {
                         withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {
                             termsAccepted.toggle()
                         }
                     } label: {
                         HStack(alignment: .top, spacing: 10) {
-                            // Checkbox with validation
                             ZStack {
                                 RoundedRectangle(cornerRadius: 5)
                                     .stroke(showValidationErrors && !isTermsAccepted ? Color.red : (termsAccepted ? Color("second") : Color.gray), lineWidth: 2)
@@ -181,7 +176,6 @@ struct UserDataFormView: View {
                                 }
                             }
                             
-                            // Terms text
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("I acknowledge and agree to CycleMate's ")
                                     .foregroundColor(.gray) +
@@ -200,14 +194,12 @@ struct UserDataFormView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                     
-                    // Newsletter checkbox
                     Button {
                         withAnimation(.spring(response: 0.2, dampingFraction: 0.7)) {
                             newsletterAccepted.toggle()
                         }
                     } label: {
                         HStack(alignment: .top, spacing: 10) {
-                            // Checkbox
                             ZStack {
                                 RoundedRectangle(cornerRadius: 5)
                                     .stroke(newsletterAccepted ? Color("second") : Color.gray, lineWidth: 2)
@@ -221,7 +213,6 @@ struct UserDataFormView: View {
                                 }
                             }
                             
-                            // Newsletter text
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("(Optional) Keep me updated")
                                     .fontWeight(.medium)
@@ -235,7 +226,6 @@ struct UserDataFormView: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                     
-                    // Continue button
                     Button {
                         if isFormValid {
                             Task {
@@ -264,9 +254,7 @@ struct UserDataFormView: View {
                 .background(Color(.systemBackground))
             }
             
-            // Floating calendar overlay
             if showDatePicker {
-                // Semi-transparent background
                 Color.black
                     .opacity(0.3)
                     .ignoresSafeArea()
@@ -276,7 +264,6 @@ struct UserDataFormView: View {
                         }
                     }
                 
-                // Calendar picker
                 VStack {
                     DatePicker(
                         "Select date",
@@ -294,7 +281,6 @@ struct UserDataFormView: View {
                     .padding()
                     .tint(Color("second"))
                     
-                    // Done button
                     Button {
                         withAnimation(.spring()) {
                             showDatePicker = false

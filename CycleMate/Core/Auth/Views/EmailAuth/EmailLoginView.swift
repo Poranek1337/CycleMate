@@ -27,10 +27,8 @@ struct EmailLoginView: View {
     /// A flag indicating whether validation errors should be shown.
     @State private var showValidationErrors = false
     
-    // Add keyboard state
     @State private var keyboardHeight: CGFloat = 0
     
-    // Validation states
     private var isEmailValid: Bool { !viewModel.email.isEmpty }
     private var isPasswordValid: Bool { !viewModel.password.isEmpty }
     private var isFormValid: Bool { isEmailValid && isPasswordValid }
@@ -38,7 +36,6 @@ struct EmailLoginView: View {
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Semi-transparent background
             Color.black
                 .opacity(0.3)
                 .ignoresSafeArea()
@@ -46,9 +43,7 @@ struct EmailLoginView: View {
                     dismissCard()
                 }
             
-            // Card View
             VStack(alignment: .leading, spacing: 0) {
-                // Handle indicator
                 Rectangle()
                     .fill(Color.gray.opacity(0.15))
                     .frame(width: 50, height: 5)
@@ -57,9 +52,7 @@ struct EmailLoginView: View {
                     .padding(.top, 15)
                     .padding(.bottom, 10)
                 
-                // Content
                 VStack(alignment: .leading, spacing: 10) {
-                    // Title and description
                     Text("Login to CycleMate")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.primary)
@@ -69,13 +62,11 @@ struct EmailLoginView: View {
                         .foregroundColor(.gray)
                         .padding(.bottom, 2)
                     
-                    // Form fields with validation
                     VStack(spacing: 10) {
-                        // Email field with increased height
                         TextField("Email", text: $viewModel.email)
                             .textInputAutocapitalization(.never)
                             .keyboardType(.emailAddress)
-                            .padding(.vertical, 16) // Increased padding
+                            .padding(.vertical, 16)
                             .padding(.horizontal, 12)
                             .frame(maxWidth: .infinity)
                             .overlay(
@@ -90,9 +81,8 @@ struct EmailLoginView: View {
                                 .padding(.bottom, -5)
                         }
                         
-                        // Password field with increased height
                         SecureField("Password", text: $viewModel.password)
-                            .padding(.vertical, 16) // Increased padding
+                            .padding(.vertical, 16)
                             .padding(.horizontal, 12)
                             .frame(maxWidth: .infinity)
                             .overlay(
@@ -108,7 +98,6 @@ struct EmailLoginView: View {
                         }
                     }
                     
-                    // Forgot password button
                     Button {
                         showPasswordReset = true
                     } label: {
@@ -118,7 +107,6 @@ struct EmailLoginView: View {
                     }
                     .padding(.top, 2)
                     
-                    // Create account section
                     HStack {
                         Text("Don't have an account?")
                             .foregroundColor(.gray)
@@ -134,7 +122,6 @@ struct EmailLoginView: View {
                     .font(.subheadline)
                     .padding(.top, 2)
                     
-                    // Login button
                     Button {
                         if isFormValid {
                             Task {
@@ -223,7 +210,7 @@ struct EmailLoginView: View {
         .sheet(isPresented: $showPasswordReset) {
             PasswordResetView()
         }
-        .onChange(of: viewModel.userSession) { newValue in
+        .onChange(of: viewModel.userSession) { oldValue, newValue in
             if newValue != nil {
                 dismissCard()
             }

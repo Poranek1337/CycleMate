@@ -46,7 +46,6 @@ struct AuthenticationView: View {
     // MARK: - Body
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Semi-transparent background
             Color.black
                 .opacity(backgroundOpacity)
                 .ignoresSafeArea()
@@ -54,18 +53,16 @@ struct AuthenticationView: View {
                     dismissCard()
                 }
             
-            // Card View
             VStack(spacing: 0) {
-                // Handle indicator at the very top
                 Rectangle()
                     .fill(Color.gray.opacity(0.15))
                     .frame(width: 50, height: 5)
                     .cornerRadius(2.5)
-                    .padding(.top, 20)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 15)
+                    .padding(.bottom, 15)
                 
-                // Content
                 VStack(spacing: 25) {
-                    // Primary action buttons
                     AuthButton(
                         title: "Sign Up",
                         style: .primary
@@ -80,19 +77,17 @@ struct AuthenticationView: View {
                         showEmailLogin = true
                     }
                     
-                    // Divider with 'or'
                     HStack {
                         Line()
                         Text("or")
                             .font(.headline)
                             .foregroundColor(.gray)
-                            .padding(.horizontal, 10)
+                            .padding(.horizontal, 1)
                         Line()
                     }
-                    .padding(.vertical, 15)
+                    .padding(.vertical, 10)
                     
-                    // Social login buttons
-                    VStack(spacing: 20) {
+                    VStack(spacing: 15) {
                         AuthButton(
                             title: "Continue with Apple",
                             systemImage: "apple.logo",
@@ -141,9 +136,7 @@ struct AuthenticationView: View {
                     }
                 }
                 .padding(.horizontal, 25)
-                .padding(.top, 20)
-                .padding(.bottom, 40)
-                
+                .padding(.top, 5)
                 Spacer()
             }
             .frame(maxWidth: .infinity)
@@ -178,7 +171,7 @@ struct AuthenticationView: View {
                 offset = 0
             }
         }
-        .onChange(of: showMainTabView) { newValue in
+        .onChange(of: showMainTabView) { oldValue, newValue in
             if newValue {
                 DispatchQueue.main.async {
                     if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -230,7 +223,6 @@ struct Line: View {
     }
 }
 
-// Preview remains the same
 #Preview {
     AuthenticationView(isPresented: .constant(true), onSuccessfulAuth: {})
 }

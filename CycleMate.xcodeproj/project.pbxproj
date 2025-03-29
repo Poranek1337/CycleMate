@@ -14,6 +14,7 @@
 		D0059B342D282F9800B3D100 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B332D282F9500B3D100 /* MainTabView.swift */; };
 		D0059B382D28535700B3D100 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B372D28535400B3D100 /* User.swift */; };
 		D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */; };
+		D01E646D2D907078005EDCDB /* SpeedometerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01E646C2D907078005EDCDB /* SpeedometerView.swift */; };
 		D039C6F32CF4BB83000F6ACE /* FirstLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D039C6F22CF4BB83000F6ACE /* FirstLaunchView.swift */; };
 		D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */; };
 		D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06BC1C92D2C3E5C00E504C8 /* EmailLoginView.swift */; };
@@ -95,6 +96,7 @@
 		D0059B332D282F9500B3D100 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		D0059B372D28535400B3D100 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailSignUpView.swift; sourceTree = "<group>"; };
+		D01E646C2D907078005EDCDB /* SpeedometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedometerView.swift; sourceTree = "<group>"; };
 		D039C6F22CF4BB83000F6ACE /* FirstLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchView.swift; sourceTree = "<group>"; };
 		D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordResetView.swift; sourceTree = "<group>"; };
 		D06BC1C92D2C3E5C00E504C8 /* EmailLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailLoginView.swift; sourceTree = "<group>"; };
@@ -123,7 +125,6 @@
 		D0CF02762D0E0D9000D0B15C /* AuthButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthButton.swift; sourceTree = "<group>"; };
 		D0CF02782D0E4B8600D0B15C /* ProfilePictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureView.swift; sourceTree = "<group>"; };
 		D0CF027C2D0E531000D0B15C /* ViewModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
-		D0CF02A92D0F312D00D0B15C /* CameraControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraControls.swift; sourceTree = "<group>"; };
 		D0CF02AB2D0F315500D0B15C /* ImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerView.swift; sourceTree = "<group>"; };
 		D0CF02AD2D0F316000D0B15C /* ImageCropperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropperView.swift; sourceTree = "<group>"; };
 		D0CF02B02D0F31D300D0B15C /* ImagePickerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerModel.swift; sourceTree = "<group>"; };
@@ -220,6 +221,7 @@
 		D0059B2A2D282EC700B3D100 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				D01E646C2D907078005EDCDB /* SpeedometerView.swift */,
 				D0059B2B2D282ED400B3D100 /* MapView.swift */,
 			);
 			path = View;
@@ -246,17 +248,9 @@
 			children = (
 				D06BC1C92D2C3E5C00E504C8 /* EmailLoginView.swift */,
 				D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */,
-				D06BC1C22D2C34E800E504C8 /* Services */,
 				D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */,
 			);
 			path = EmailAuth;
-			sourceTree = "<group>";
-		};
-		D06BC1C22D2C34E800E504C8 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Services;
 			sourceTree = "<group>";
 		};
 		D0B592ED2C20E3390026D977 = {
@@ -498,7 +492,6 @@
 		D0CF02822D0E5B2F00D0B15C /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D0CF02902D0E5BC800D0B15C /* Components */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -508,14 +501,6 @@
 			children = (
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		D0CF02902D0E5BC800D0B15C /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				D0CF02A92D0F312D00D0B15C /* CameraControls.swift */,
-			);
-			path = Components;
 			sourceTree = "<group>";
 		};
 		D0CF02AA2D0F314600D0B15C /* Components */ = {
@@ -747,6 +732,7 @@
 				D0059B302D282F0500B3D100 /* CalendarView.swift in Sources */,
 				D0CF02772D0E0D9000D0B15C /* AuthButton.swift in Sources */,
 				D0CBC0A32D0A5058007513ED /* OnboardingSlide.swift in Sources */,
+				D01E646D2D907078005EDCDB /* SpeedometerView.swift in Sources */,
 				D0B592FC2C20E3390026D977 /* ContentView.swift in Sources */,
 				D0059B282D282EB100B3D100 /* HomeView.swift in Sources */,
 				D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */,
@@ -774,7 +760,6 @@
 				D0CBC09E2D0A4F6C007513ED /* FirstLaunchViewModel.swift in Sources */,
 				D0B5932A2C20E4400026D977 /* SplashScreenView.swift in Sources */,
 				D0F5F1E82D32B89D000D6611 /* ProfileInitialsView.swift in Sources */,
-				D0C4CBEF2D0DC0A80047EAA9 /* EmailAuthView.swift in Sources */,
 				D0CF02B12D0F31D700D0B15C /* ImagePickerModel.swift in Sources */,
 				D0F5F2362D333836000D6611 /* LocationManager.swift in Sources */,
 			);

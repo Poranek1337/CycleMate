@@ -114,7 +114,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         
         mapView.showsUserLocation = true
         mapView.showsUserHeadingIndicator = true
-        mapView.minimumZoomLevel = 1
+        mapView.minimumZoomLevel = 10
         mapView.maximumZoomLevel = 20
         mapView.setZoomLevel(10, animated: true)
         
@@ -146,7 +146,9 @@ struct MapViewRepresentable: UIViewRepresentable {
                 pitch: 45,
                 heading: userCourse > 0 ? userCourse : userHeading
             )
-            uiView.setCamera(camera, animated: false)
+            MLNMapView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) {
+                uiView.setCamera(camera, animated: false)
+            }
         } else {
             uiView.setUserTrackingMode(.none, animated: true) {}
         }

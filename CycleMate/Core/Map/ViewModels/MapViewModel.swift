@@ -6,13 +6,11 @@
 import SwiftUI
 import MapLibre
 
-// Notification name remains the same
 extension Notification.Name {
     static let mapInteractionOccurred = Notification.Name("mapInteractionOccurred")
 }
 
 class MapViewModel: ObservableObject {
-    // Properties
     @Published var isTrackingUser: Bool = false
     @Published var selectedMapStyle: MapStyle = .streets
     @Published var cameraAltitude: Double = 200
@@ -20,7 +18,6 @@ class MapViewModel: ObservableObject {
     private var notificationToken: NSObjectProtocol?
     
     init() {
-        // Setup notification observer
         notificationToken = NotificationCenter.default.addObserver(
             forName: .mapInteractionOccurred,
             object: nil,
@@ -36,7 +33,6 @@ class MapViewModel: ObservableObject {
         }
     }
     
-    // Toggle tracking function remains the same
     func toggleTracking() {
         isTrackingUser.toggle()
     }
@@ -45,7 +41,6 @@ class MapViewModel: ObservableObject {
         isTrackingUser = false
     }
     
-    // Map style enum remains the same
     enum MapStyle: String, CaseIterable {
         case streets = "streets"
         case outdoors = "outdoor"

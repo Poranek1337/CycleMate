@@ -40,9 +40,7 @@ struct ProfilePictureView: View {
         NavigationView {
             GeometryReader { geometry in
                 ZStack(alignment: .bottom) {
-                    // Main content section remains the same
                     VStack(spacing: 0) {
-                        // Header section remains the same
                         HStack(alignment: .top) {
                             Button(action: {
                                 print(" User tapped back button")
@@ -58,7 +56,6 @@ struct ProfilePictureView: View {
                         .padding(.horizontal)
                         .padding(.top)
                         
-                        // Title and description section remains the same
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Add profile picture ")
                                 .font(.system(size: 32, weight: .bold))
@@ -99,7 +96,6 @@ struct ProfilePictureView: View {
                         
                         Spacer()
                         
-                        // Bottom buttons remain the same
                         VStack(spacing: 15) {
                             Button {
                                 print(" Choose photo button tapped")
@@ -145,17 +141,15 @@ struct ProfilePictureView: View {
                         .background(Color(.systemBackground))
                     }
                     
-                    // Updated photo selection card
+
                     if showPhotoOptions {
                         Color.black
                             .opacity(backgroundOpacity)
-                            .ignoresSafeArea()
                             .onTapGesture {
                                 dismissPhotoOptions()
                             }
                         
                         VStack(spacing: 0) {
-                            // Handle indicator
                             Rectangle()
                                 .fill(Color.gray.opacity(0.15))
                                 .frame(width: 50, height: 5)
@@ -163,7 +157,6 @@ struct ProfilePictureView: View {
                                 .padding(.top, 8)
                                 .padding(.bottom, 15)
                             
-                            // Photo options buttons
                             VStack(spacing: 12) {
                                 Button {
                                     print(" User tapped Take Photo")
@@ -235,7 +228,6 @@ struct ProfilePictureView: View {
                         )
                     }
                 }
-                // Sheet modifiers remain the same
                 .sheet(isPresented: $imagePickerModel.showImagePicker) {
                     ImagePickerView(
                         sourceType: imagePickerModel.sourceType,
@@ -245,7 +237,6 @@ struct ProfilePictureView: View {
                             imagePickerModel.showCropper = true
                         }
                     }
-                    .ignoresSafeArea()
                 }
                 .sheet(isPresented: $imagePickerModel.showCropper) {
                     if let image = imagePickerModel.selectedImage {
@@ -266,7 +257,6 @@ struct ProfilePictureView: View {
             }
             .onAppear {
                 print(" View appeared")
-                // Disable checksum verification when entering profile picture view
                 ProfileImageManager.shared.setChecksumVerification(enabled: false)
                 withAnimation(.easeOut(duration: 0.8)) {
                     animateContent = true
@@ -276,7 +266,6 @@ struct ProfilePictureView: View {
                 }
             }
             .onDisappear {
-                // Re-enable checksum verification when leaving profile picture view
                 ProfileImageManager.shared.setChecksumVerification(enabled: true)
             }
         }

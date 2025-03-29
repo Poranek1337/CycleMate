@@ -16,26 +16,21 @@ struct SplashScreenView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            // Content layer - Always visible but initially without its white background
             Group {
-                if let user = authViewModel.currentUser {
-                    // User has an active session, show MainTabView
+                if authViewModel.currentUser != nil {
                     MainTabView()
                         .background(Color.clear)
                         .environmentObject(authViewModel)
                 } else {
-                    // No active session, show FirstLaunchView
                     FirstLaunchView()
                         .background(Color.clear)
                 }
             }
             
-            // Green background that covers the entire screen
             Color("second")
                 .edgesIgnoringSafeArea(.all)
                 .opacity(showContent ? 0 : 1)
             
-            // Splash screen overlay with bike
             GeometryReader { geometry in
                 ZStack {
                     ArcShape()
@@ -50,14 +45,10 @@ struct SplashScreenView: View {
                 .offset(y: offset)
                 .padding(.bottom, padding)
                 .onAppear {
-                    // Check for existing session
                     Task {
-                        // Give time for AuthViewModel to initialize
-                        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                        try? await Task.sleep(nanoseconds: 500_000_000)
                         
-                        // Animate splash screen after delay
                         withAnimation(.easeInOut(duration: 0.7)) {
-                            // Increased offset to move splash screen further down
                             self.offset = geometry.size.height + 200
                             self.padding = 100
                             self.showContent = true
