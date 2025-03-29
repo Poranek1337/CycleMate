@@ -42,13 +42,16 @@ struct MapView: View {
                         viewModel.handleMapInteraction()
                     }
                 )
-                .frame(width: geometry.size.width + 20, height: geometry.size.height + 20)
-                .offset(x: -10, y: -10)
                 .edgesIgnoringSafeArea(.all)
+                .ignoresSafeArea()
                 
                 VStack {
-                    Spacer().frame(height: 60)
-                    
+                    HStack {
+                        Spacer()
+                        LocationSearchView()
+                        Spacer()
+                    }
+                    Spacer().frame(height: 30)
                     HStack {
                         Spacer()
                         VStack(spacing: 10) {
@@ -78,13 +81,12 @@ struct MapView: View {
                                     .clipShape(Circle())
                             }
                         }
-                        .padding(.trailing, 20)
+                        .padding(.trailing, 10)
                     }
                     Spacer()
                 }
             }
         }
-        .ignoresSafeArea()
         .onAppear {
             locationManager.startUpdatingLocation()
             if locationManager.hasLocationPermission {
@@ -114,7 +116,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         
         mapView.showsUserLocation = true
         mapView.showsUserHeadingIndicator = true
-        mapView.minimumZoomLevel = 10
+        mapView.minimumZoomLevel = 1
         mapView.maximumZoomLevel = 20
         mapView.setZoomLevel(10, animated: true)
         

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1EE3C6682D980A2800BD255A /* LocationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE3C6672D980A2800BD255A /* LocationSearchView.swift */; };
 		D0059B242D282E0C00B3D100 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B232D282E0800B3D100 /* CustomTabBar.swift */; };
 		D0059B282D282EB100B3D100 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B272D282EAC00B3D100 /* HomeView.swift */; };
 		D0059B2C2D282EDB00B3D100 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B2B2D282ED400B3D100 /* MapView.swift */; };
@@ -89,6 +90,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1EE3C6672D980A2800BD255A /* LocationSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchView.swift; sourceTree = "<group>"; };
 		D0059B232D282E0800B3D100 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
 		D0059B272D282EAC00B3D100 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		D0059B2B2D282ED400B3D100 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 			children = (
 				D01E646C2D907078005EDCDB /* SpeedometerView.swift */,
 				D0059B2B2D282ED400B3D100 /* MapView.swift */,
+				1EE3C6672D980A2800BD255A /* LocationSearchView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -754,6 +757,7 @@
 				D0F5F1F02D32F1AD000D6611 /* BikesComponent.swift in Sources */,
 				D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */,
 				D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */,
+				1EE3C6682D980A2800BD255A /* LocationSearchView.swift in Sources */,
 				D0CBC0992D0A4E80007513ED /* PageIndicator.swift in Sources */,
 				D0059B342D282F9800B3D100 /* MainTabView.swift in Sources */,
 				D0059B242D282E0C00B3D100 /* CustomTabBar.swift in Sources */,

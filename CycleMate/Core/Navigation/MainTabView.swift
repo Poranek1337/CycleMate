@@ -52,6 +52,7 @@ struct MainTabView: View {
                     }
                     .environmentObject(authViewModel)
                 }
+                .ignoresSafeArea()
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(nil, value: selectedTab)
                 .onChange(of: selectedTab) { oldValue, newValue in
@@ -127,7 +128,6 @@ struct MainTabView: View {
     }
     
     // MARK: - Helper Functions
-    
     private func updateInteractionTime() {
         lastInteractionTime = Date()
         if !isTabBarVisible {

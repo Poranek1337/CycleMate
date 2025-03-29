@@ -137,6 +137,7 @@ struct CustomTabBar: View {
                     .padding(.vertical, 10)
                 }
             }
+            .ignoresSafeArea()
         }
     }
     
