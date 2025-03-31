@@ -6,7 +6,6 @@
 import SwiftUI
 
 struct ProfileInitialsView: View {
-    // Remove AuthViewModel as we don't need it anymore
     let user: User?
     var size: CGFloat = 50
     var fontSize: CGFloat = 20
@@ -25,10 +24,31 @@ struct ProfileInitialsView: View {
             Circle()
                 .fill(Color.gray)
                 .frame(width: size, height: size)
+                .overlay(
+                    Image(systemName: "person.fill")
+                        .font(.system(size: fontSize * 0.8))
+                        .foregroundColor(.white)
+                )
         }
     }
 }
 
 #Preview {
-    ProfileInitialsView(user: nil)
+    let sampleUser = User(
+        id: "sample",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@example.com",
+        photoURL: "",
+        createdAt: Date(),
+        dateOfBirth: nil,
+        provider: "email",
+        isProfileCompleted: true,
+        backgroundColor: nil
+    )
+    
+    return Group {
+        ProfileInitialsView(user: sampleUser)
+        ProfileInitialsView(user: nil)
+    }
 }

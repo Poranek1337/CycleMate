@@ -26,6 +26,7 @@ struct HomeView: View {
                     
                     // Profile Picture Section
                     if let user = authViewModel.currentUser {
+<<<<<<< Updated upstream
                         if !user.photoURL.isEmpty {
                             if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: user.id) {
                                 Image(uiImage: localImage)
@@ -49,6 +50,17 @@ struct HomeView: View {
                         }
                     } else {
                         ProfileInitialsView(user: nil)
+=======
+                        Button(action: { showProfileView = true }) {
+                            ProfileImageView(user: user)
+                        }
+                    } else {
+                        ProfileInitialsView(user: nil)
+                            .frame(width: 50, height: 50)
+                            .onTapGesture {
+                                showProfileView = true
+                            }
+>>>>>>> Stashed changes
                     }
                 }
                 .padding()
