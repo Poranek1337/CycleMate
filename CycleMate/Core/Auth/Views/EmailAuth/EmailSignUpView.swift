@@ -323,8 +323,17 @@ struct EmailSignUpView: View {
             Task {
                 verificationStatus = .verifying
                 showVerificationPopup = true
-                await viewModel.sendVerificationEmail(email: email, password: password)
-                await checkVerification()
+                let result = await viewModel.sendVerificationEmail(email: email, password: password)
+                if result {
+                    await checkVerification()
+                } else {
+                    await MainActor.run {
+                        verificationStatus = .failed
+                        viewModel.errorMessage = "Failed to send verification email"
+                        viewModel.showError = true
+                        showVerificationPopup = false
+                    }
+                }
             }
         } else {
             withAnimation {
@@ -334,7 +343,6 @@ struct EmailSignUpView: View {
     }
     
     private func checkVerification() async {
-        // Check for 5 minutes (60 * 5 seconds)
         for _ in 0..<60 {
             try? await Task.sleep(nanoseconds: 5_000_000_000) // 5 seconds
             if let user = Auth.auth().currentUser {
@@ -348,7 +356,6 @@ struct EmailSignUpView: View {
                 }
             }
         }
-        // If verification timeout occurs
         await MainActor.run {
             viewModel.errorMessage = "Email verification timeout. Please try again."
             viewModel.showError = true
@@ -364,18 +371,16 @@ struct EmailSignUpView: View {
     var body: some View {
         ZStack(alignment: .center) {
             VStack(spacing: 0) {
-                // Content area
                 VStack(spacing: 0) {
                     headerSection
                     titleSection
                     formSection
-                    Spacer() // This will push content up
+                    Spacer()
                 }
                 
-                // Bottom section always stays at bottom
                 bottomSection
                     .background(Color(.systemBackground))
-                    .ignoresSafeArea(.keyboard) // This prevents keyboard from pushing content up
+                    .ignoresSafeArea(.keyboard)
             }
             
             if showDatePicker {

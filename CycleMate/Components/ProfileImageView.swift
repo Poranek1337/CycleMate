@@ -8,47 +8,52 @@
 import SwiftUI
 
 struct ProfileImageView: View {
-    let user: User
+    let user: User?
     let size: CGFloat
     
-    init(user: User, size: CGFloat = 50) {
+    init(user: User?, size: CGFloat = 50) {
         self.user = user
         self.size = size
     }
     
     var body: some View {
-        if !user.photoURL.isEmpty {
-            if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: user.id) {
-                Image(uiImage: localImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: size, height: size)
-                    .clipShape(Circle())
-            } else {
-                AsyncImage(url: URL(string: user.photoURL)) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: size, height: size)
-                        .clipShape(Circle())
-                } placeholder: {
-                    ProfileInitialsView(user: user)
-                        .frame(width: size, height: size)
+        Group {
+            if let user = user {
+                if !user.photoURL.isEmpty {
+                    if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: user.id) {
+                        Image(uiImage: localImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: size, height: size)
+                            .clipShape(Circle())
+                    } else {
+                        AsyncImage(url: URL(string: user.photoURL)) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: size, height: size)
+                                .clipShape(Circle())
+                        } placeholder: {
+                            ProfileInitialsView(user: user, size: size)
+                        }
+                    }
+                } else {
+                    ProfileInitialsView(user: user, size: size)
                 }
+            } else {
+                ProfileInitialsView(user: nil, size: size)
             }
-        } else {
-            ProfileInitialsView(user: user)
-                .frame(width: size, height: size)
         }
+        .frame(width: size, height: size)
     }
 }
 
 #Preview {
     let sampleUser = User(
         id: "preview-id",
-        firstName: "Pawel",
-        lastName: "Nierdoka",
-        email: "pawel@example.com",
+        firstName: "John",
+        lastName: "Doe",
+        email: "John@example.com",
         photoURL: "",
         createdAt: Date(),
         dateOfBirth: nil,
@@ -57,5 +62,8 @@ struct ProfileImageView: View {
         backgroundColor: nil
     )
     
-    return ProfileImageView(user: sampleUser, size: 50)
+    return HStack {
+        ProfileImageView(user: sampleUser, size: 50)
+        ProfileImageView(user: sampleUser, size: 100)
+    }
 }

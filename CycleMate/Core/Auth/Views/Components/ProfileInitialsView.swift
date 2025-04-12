@@ -7,7 +7,7 @@ import SwiftUI
 
 struct ProfileInitialsView: View {
     let user: User?
-    var size: CGFloat = 50
+    var size: CGFloat = 100
     var fontSize: CGFloat = 20
     
     var body: some View {

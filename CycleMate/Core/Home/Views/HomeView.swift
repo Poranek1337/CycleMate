@@ -8,6 +8,7 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var authViewModel: AuthViewModel
     @State private var isCheckingImage = false
+    @State private var showProfileView = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -24,49 +25,14 @@ struct HomeView: View {
                     
                     Spacer()
                     
-                    // Profile Picture Section
-                    if let user = authViewModel.currentUser {
-<<<<<<< Updated upstream
-                        if !user.photoURL.isEmpty {
-                            if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: user.id) {
-                                Image(uiImage: localImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 50, height: 50)
-                                    .clipShape(Circle())
-                            } else {
-                                AsyncImage(url: URL(string: user.photoURL)) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 50, height: 50)
-                                        .clipShape(Circle())
-                                } placeholder: {
-                                    ProfileInitialsView(user: user)
-                                }
-                            }
-                        } else {
-                            ProfileInitialsView(user: user)
-                        }
-                    } else {
-                        ProfileInitialsView(user: nil)
-=======
-                        Button(action: { showProfileView = true }) {
-                            ProfileImageView(user: user)
-                        }
-                    } else {
-                        ProfileInitialsView(user: nil)
-                            .frame(width: 50, height: 50)
-                            .onTapGesture {
-                                showProfileView = true
-                            }
->>>>>>> Stashed changes
+                    Button {
+                        showProfileView = true
+                    } label: {
+                        ProfileImageView(user: authViewModel.currentUser, size: 50)
                     }
                 }
                 .padding()
-                .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top)
                 
-                // Components
                 MapPreviewComponent()
                 
                 HStack(spacing: 15) {
@@ -79,7 +45,9 @@ struct HomeView: View {
             }
             .padding(.bottom, 80)
         }
-        .edgesIgnoringSafeArea(.top)
+        .sheet(isPresented: $showProfileView) {
+            ProfileView()
+        }
         .task {
             await authViewModel.fetchUser()
             if !isCheckingImage {

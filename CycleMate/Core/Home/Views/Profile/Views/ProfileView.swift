@@ -31,7 +31,7 @@ struct ProfileView: View {
                 }
             }
             .sheet(isPresented: $showSettings) {
-                SettingsView()
+                //TODO: Implement SettingsView
             }
         }
     }
