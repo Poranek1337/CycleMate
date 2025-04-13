@@ -20,7 +20,8 @@ struct ProfileImageView: View {
         Group {
             if let user = user {
                 if !user.photoURL.isEmpty {
-                    if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: user.id) {
+                    if let token = user.token,
+                       let localImage = ProfileImageManager.shared.loadLocalImage(withToken: token) {
                         Image(uiImage: localImage)
                             .resizable()
                             .scaledToFit()

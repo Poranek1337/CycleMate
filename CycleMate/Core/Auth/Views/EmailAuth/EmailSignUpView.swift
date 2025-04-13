@@ -4,6 +4,9 @@
 //  dev.Poranek
 //
 
+//TODO: ROZBIC NA KOMPONENTY - za dlugi, naprawic odstep od gory - h1
+
+
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -59,12 +62,14 @@ struct EmailSignUpView: View {
     
     // MARK: - View Components
     private var headerSection: some View {
-        HStack(alignment: .top) {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .font(.title2)
-                    .foregroundColor(.primary)
-            }
+        VStack() {
+            Rectangle()
+                .fill(Color.gray.opacity(0.15))
+                .frame(width: 50, height: 5)
+                .cornerRadius(2.5)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 15)
+
             Spacer()
         }
         .padding(.horizontal)
@@ -321,15 +326,40 @@ struct EmailSignUpView: View {
     private func handleContinueButton() {
         if isFormValid {
             Task {
-                verificationStatus = .verifying
-                showVerificationPopup = true
-                let result = await viewModel.sendVerificationEmail(email: email, password: password)
-                if result {
-                    await checkVerification()
-                } else {
+                do {
+                    // Update status for UI feedback
                     await MainActor.run {
+                        verificationStatus = .verifying
+                        showVerificationPopup = true
+                    }
+                    
+                    print("🔄 Starting user creation process...")
+                    
+                    // Attempt to create user with API
+                    try await viewModel.createVerifiedUser(email: email, password: password)
+                    
+                    // Update UI on success
+                    await MainActor.run {
+                        print("✅ User creation successful")
+                        verificationStatus = .success
+                        showProfilePictureView = true
+                        showVerificationPopup = false
+                    }
+                } catch let error as AuthError {
+                    // Handle specific auth errors
+                    await MainActor.run {
+                        print("❌ Auth error: \(error.description)")
                         verificationStatus = .failed
-                        viewModel.errorMessage = "Failed to send verification email"
+                        viewModel.errorMessage = error.description
+                        viewModel.showError = true
+                        showVerificationPopup = false
+                    }
+                } catch {
+                    // Handle other errors
+                    await MainActor.run {
+                        print("❌ Unexpected error: \(error)")
+                        verificationStatus = .failed
+                        viewModel.errorMessage = "An unexpected error occurred: \(error.localizedDescription)"
                         viewModel.showError = true
                         showVerificationPopup = false
                     }
@@ -339,27 +369,6 @@ struct EmailSignUpView: View {
             withAnimation {
                 showValidationErrors = true
             }
-        }
-    }
-    
-    private func checkVerification() async {
-        for _ in 0..<60 {
-            try? await Task.sleep(nanoseconds: 5_000_000_000) // 5 seconds
-            if let user = Auth.auth().currentUser {
-                try? await user.reload()
-                if user.isEmailVerified {
-                    // Update verification status
-                    await MainActor.run {
-                        verificationStatus = .success
-                    }
-                    return
-                }
-            }
-        }
-        await MainActor.run {
-            viewModel.errorMessage = "Email verification timeout. Please try again."
-            viewModel.showError = true
-            showVerificationPopup = false
         }
     }
     
@@ -467,16 +476,14 @@ struct EmailSignUpView: View {
             VStack(spacing: 20) {
                 verificationStatusIcon
                 
-                Text(verificationStatus == .success ? "Email Verified!" : "Verification Email Sent")
+                Text(verificationStatus == .success ? "Account Created!" : "Creating Account...")
                     .font(.title2)
                     .fontWeight(.bold)
                 
-                Text("We've sent a verification email to \(email). Please check your inbox and click the verification link to complete your registration.")
+                Text("Please wait while we create your account...")
                     .multilineTextAlignment(.center)
                     .foregroundColor(.gray)
                     .padding(.horizontal)
-                
-                verificationActionButton
             }
             .padding()
             .background(Color(.systemBackground))
@@ -504,39 +511,13 @@ struct EmailSignUpView: View {
                         removal: .scale.combined(with: .opacity)
                     ))
             } else {
-                Image(systemName: "envelope.circle.fill")
+                Image(systemName: "person.crop.circle.badge.plus")
                     .font(.system(size: 60))
             }
         }
         .foregroundColor(Color("second"))
         .padding()
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: verificationStatus)
-    }
-    
-    private var verificationActionButton: some View {
-        Button {
-            if verificationStatus == .success {
-                Task {
-                    do {
-                        try await viewModel.createVerifiedUser(email: email, password: password)
-                        showProfilePictureView = true
-                    } catch {
-                        print("❌ Failed to create verified user: \(error)")
-                        viewModel.errorMessage = "Failed to complete registration. Please try again."
-                        viewModel.showError = true
-                    }
-                }
-            }
-        } label: {
-            Text(verificationStatus == .success ? "Continue" : "Verifying...")
-                .font(.headline)
-                .foregroundColor(.primary)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 30)
-                .background(verificationStatus == .success ? Color("second") : Color.gray)
-                .cornerRadius(20)
-        }
-        .disabled(verificationStatus != .success)
     }
 }
 

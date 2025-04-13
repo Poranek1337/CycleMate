@@ -89,6 +89,13 @@ class AuthenticationManager: ObservableObject {
         let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
         let user = authResult.user
         
+        // Get token from API response
+        let apiService = APIService()
+        let authResponse = try await apiService.createUser(registrationData: [
+            "email": email,
+            "password": password
+        ])
+        
         // Create initial user document in Firestore
         let userData: [String: Any] = [
             "id": user.uid,
@@ -99,7 +106,8 @@ class AuthenticationManager: ObservableObject {
             "createdAt": FieldValue.serverTimestamp(),
             "dateOfBirth": NSNull(),
             "provider": "email",
-            "isProfileCompleted": false
+            "isProfileCompleted": false,
+            "token": authResponse.token // Add token from API response
         ]
         
         // Create user document first
@@ -119,7 +127,8 @@ class AuthenticationManager: ObservableObject {
             createdAt: Date(),
             dateOfBirth: nil,
             provider: .email,
-            isProfileCompleted: false
+            isProfileCompleted: false,
+            token: authResponse.token // Add token to AuthUser
         )
         
         self.isAuthenticated = true
@@ -222,6 +231,7 @@ class AuthenticationManager: ObservableObject {
         let createdAt = (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
         let dateOfBirth = (data["dateOfBirth"] as? Timestamp)?.dateValue()
         let isProfileCompleted = data["isProfileCompleted"] as? Bool ?? false
+        let token = data["token"] as? String
         
         let user = AuthUser(
             id: firebaseId,
@@ -232,7 +242,8 @@ class AuthenticationManager: ObservableObject {
             createdAt: createdAt,
             dateOfBirth: dateOfBirth,
             provider: .email,
-            isProfileCompleted: isProfileCompleted
+            isProfileCompleted: isProfileCompleted,
+            token: token // Add token
         )
         
         self.currentUser = user
@@ -258,9 +269,9 @@ class AuthenticationManager: ObservableObject {
         // Now create Firebase account
         let authResult = try await Auth.auth().signIn(with: credential)
         
-        // Generate profile color and convert to components
+        // Generate profile color and convert to hex
         let profileColor = ColorGenerator.generateProfileColor()
-        let colorComponents = ColorGenerator.colorToComponents(profileColor)
+        let colorHex = ColorGenerator.colorToHexString(profileColor)
         
         // Create user document in Firestore
         let userData: [String: Any] = [
@@ -273,12 +284,8 @@ class AuthenticationManager: ObservableObject {
             "createdAt": FieldValue.serverTimestamp(),
             "provider": "google",
             "isProfileCompleted": true,
-            "backgroundColor": [
-                "red": colorComponents.red,
-                "green": colorComponents.green,
-                "blue": colorComponents.blue
-            ]
-        ] as [String: Any]  // CHANGE: Explicitly type the dictionary
+            "backgroundColor": colorHex
+        ]
         
         try await db.collection("users").document(authResult.user.uid).setData(userData)
         
@@ -305,61 +312,57 @@ class AuthenticationManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "google_access_token")
     }
     
-    // Rest of profile management methods remain the same
+    // MARK: - Token Management
+    private func generateUserToken() async throws -> String {
+        guard let user = Auth.auth().currentUser else {
+            throw AuthError.userNotFound
+        }
+        
+        // Get Firebase ID token
+        let token = try await user.getIDToken()
+        
+        // Create a SHA-256 hash of the token for filename
+        let tokenData = Data(token.utf8)
+        let hash = SHA256.hash(data: tokenData)
+        let hashString = hash.compactMap { String(format: "%02x", $0) }.joined()
+        
+        return hashString
+    }
+
     // MARK: - Profile Image Management
     func uploadProfileImage(_ image: UIImage) async throws {
-        // First verify current user exists
-        guard let currentFirebaseUser = Auth.auth().currentUser else {
-            print("❌ No Firebase user found")
+        guard let currentFirebaseUser = Auth.auth().currentUser,
+              let currentUser = self.currentUser,
+              let token = currentUser.token else {
             throw AuthError.userNotFound
         }
         
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            print("❌ Failed to convert image to data")
-            throw AuthError.imageUploadFailed
-        }
-        
-        print("📸 Starting profile image upload for user: \(currentFirebaseUser.uid)")
-        
-        // First verify user document exists
-        let userDoc = try await db.collection("users").document(currentFirebaseUser.uid).getDocument()
-        guard userDoc.exists else {
-            print("❌ User document not found in Firestore")
-            throw AuthError.userNotFound
-        }
-        
-        // Generate unique filename with timestamp
-        let fileName = "\(currentFirebaseUser.uid)_\(Int(Date().timeIntervalSince1970)).jpg"
-        let imageRef = storage.child("profile_images/\(fileName)")
+        print("📸 Starting profile image upload")
         
         do {
-            print("📤 Uploading image data...")
-            _ = try await imageRef.putDataAsync(imageData)
+            // Upload to Firebase Storage using token
+            let downloadURL = try await ProfileImageManager.shared.uploadProfileImage(image, userId: token)
             
-            print("🔗 Getting download URL...")
-            let url = try await imageRef.downloadURL()
-            
-            print("💾 Updating Firestore document...")
-            let updateData: [String: Any] = [
-                "photoURL": url.absoluteString,
+            // Update Firestore document with new photo URL
+            try await db.collection("users").document(currentFirebaseUser.uid).updateData([
+                "photoURL": downloadURL,
                 "isProfileCompleted": true
-            ] as [String: Any]  // CHANGE: Explicitly type the dictionary
-            
-            try await db.collection("users").document(currentFirebaseUser.uid).updateData(updateData)
+            ])
             
             // Update local user state
-            print("🔄 Updating local user state...")
             try await loadExistingUser(firebaseId: currentFirebaseUser.uid)
             print("✅ Profile image upload completed successfully")
+            
         } catch {
-            print("❌ Profile image upload failed with error: \(error)")
+            print("❌ Profile image upload failed: \(error)")
             throw AuthError.imageUploadFailed
         }
     }
-    
+
     func checkAndUpdateProfileImage() async throws {
         guard let currentUser = currentUser,
               let photoURL = currentUser.photoURL,
+              let token = currentUser.token,
               let url = URL(string: photoURL) else { return }
         
         let maxRetries = 3
@@ -372,12 +375,12 @@ class AuthenticationManager: ObservableObject {
                 
                 guard let remoteImage = UIImage(data: data) else { return }
                 
-                if let localImage = ProfileImageManager.shared.loadLocalImage(forUserId: currentUser.id) {
+                if let localImage = ProfileImageManager.shared.loadLocalImage(withToken: token) {
                     if !ProfileImageManager.shared.areImagesEqual(localImage: localImage, remoteImage: remoteImage) {
-                        let _ = try ProfileImageManager.shared.saveImageLocally(remoteImage, forUserId: currentUser.id)
+                        let _ = try ProfileImageManager.shared.saveImageLocally(remoteImage, withToken: token)
                     }
                 } else {
-                    let _ = try ProfileImageManager.shared.saveImageLocally(remoteImage, forUserId: currentUser.id)
+                    let _ = try ProfileImageManager.shared.saveImageLocally(remoteImage, withToken: token)
                 }
                 
                 return

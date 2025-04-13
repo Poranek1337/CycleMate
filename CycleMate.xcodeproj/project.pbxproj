@@ -41,6 +41,11 @@
 		D0B593152C20E33A0026D977 /* CycleMateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B593142C20E33A0026D977 /* CycleMateUITests.swift */; };
 		D0B593172C20E33A0026D977 /* CycleMateUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B593162C20E33A0026D977 /* CycleMateUITestsLaunchTests.swift */; };
 		D0B5932A2C20E4400026D977 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B593292C20E4400026D977 /* SplashScreenView.swift */; };
+		D0C145AD2DAA94D400674038 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145AC2DAA94BC00674038 /* AuthenticationService.swift */; };
+		D0C145AF2DAA94F600674038 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145AE2DAA94F500674038 /* APIService.swift */; };
+		D0C145B12DAAA21000674038 /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145B02DAAA20A00674038 /* AuthResponse.swift */; };
+		D0C145B32DAAD4AB00674038 /* AuthProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145B22DAAD4A900674038 /* AuthProfileService.swift */; };
+		D0C145B52DAAD50600674038 /* GoogleAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145B42DAAD50400674038 /* GoogleAuthService.swift */; };
 		D0C4CBE42D0DBC070047EAA9 /* AuthUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4CBE32D0DBC070047EAA9 /* AuthUser.swift */; };
 		D0C4CBE72D0DBC780047EAA9 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4CBE62D0DBC780047EAA9 /* AuthenticationManager.swift */; };
 		D0C4CBE92D0DBCF00047EAA9 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4CBE82D0DBCF00047EAA9 /* AuthViewModel.swift */; };
@@ -107,6 +112,7 @@
 		D0059B332D282F9500B3D100 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		D0059B372D28535400B3D100 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailSignUpView.swift; sourceTree = "<group>"; };
+		D01E46F62DAB227A007A55CC /* CycleMate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CycleMate.entitlements; sourceTree = "<group>"; };
 		D01E646C2D907078005EDCDB /* SpeedometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedometerView.swift; sourceTree = "<group>"; };
 		D039C6F22CF4BB83000F6ACE /* FirstLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchView.swift; sourceTree = "<group>"; };
 		D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordResetView.swift; sourceTree = "<group>"; };
@@ -137,6 +143,11 @@
 		D0B593142C20E33A0026D977 /* CycleMateUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleMateUITests.swift; sourceTree = "<group>"; };
 		D0B593162C20E33A0026D977 /* CycleMateUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleMateUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		D0B593292C20E4400026D977 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
+		D0C145AC2DAA94BC00674038 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
+		D0C145AE2DAA94F500674038 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		D0C145B02DAAA20A00674038 /* AuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthResponse.swift; sourceTree = "<group>"; };
+		D0C145B22DAAD4A900674038 /* AuthProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProfileService.swift; sourceTree = "<group>"; };
+		D0C145B42DAAD50400674038 /* GoogleAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthService.swift; sourceTree = "<group>"; };
 		D0C4CBE32D0DBC070047EAA9 /* AuthUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthUser.swift; sourceTree = "<group>"; };
 		D0C4CBE62D0DBC780047EAA9 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		D0C4CBE82D0DBCF00047EAA9 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
@@ -383,6 +394,7 @@
 		D0B592F82C20E3390026D977 /* CycleMate */ = {
 			isa = PBXGroup;
 			children = (
+				D01E46F62DAB227A007A55CC /* CycleMate.entitlements */,
 				D0CF027B2D0E52F600D0B15C /* Extensions */,
 				D0CF02742D0DD67D00D0B15C /* Info.plist */,
 				D0CBC0BC2D0BA082007513ED /* Services */,
@@ -482,9 +494,29 @@
 			path = Startup;
 			sourceTree = "<group>";
 		};
+		D0C145A82DAA944D00674038 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D0C145B42DAAD50400674038 /* GoogleAuthService.swift */,
+				D0C145B22DAAD4A900674038 /* AuthProfileService.swift */,
+				D0C145AE2DAA94F500674038 /* APIService.swift */,
+				D0C145AC2DAA94BC00674038 /* AuthenticationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D0C145A92DAA946F00674038 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		D0C4CBDF2D0DBBB60047EAA9 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				D0C145A92DAA946F00674038 /* Extensions */,
+				D0C145A82DAA944D00674038 /* Services */,
 				D0F5F1E42D32B433000D6611 /* Utils */,
 				D0C4CBE12D0DBBC80047EAA9 /* ViewModel */,
 				D0C4CBE02D0DBBBF0047EAA9 /* Views */,
@@ -515,6 +547,7 @@
 		D0C4CBE22D0DBBE20047EAA9 /* AuthModel */ = {
 			isa = PBXGroup;
 			children = (
+				D0C145B02DAAA20A00674038 /* AuthResponse.swift */,
 				D0C4CBE32D0DBC070047EAA9 /* AuthUser.swift */,
 			);
 			path = AuthModel;
@@ -797,6 +830,7 @@
 				D0CBC0A32D0A5058007513ED /* OnboardingSlide.swift in Sources */,
 				D01E646D2D907078005EDCDB /* SpeedometerView.swift in Sources */,
 				D0B592FC2C20E3390026D977 /* ContentView.swift in Sources */,
+				D0C145B52DAAD50600674038 /* GoogleAuthService.swift in Sources */,
 				D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */,
 				D0CF02AC2D0F315900D0B15C /* ImagePickerView.swift in Sources */,
 				D0C4CBE42D0DBC070047EAA9 /* AuthUser.swift in Sources */,
@@ -808,16 +842,20 @@
 				D0059B2C2D282EDB00B3D100 /* MapView.swift in Sources */,
 				D0C4CBE72D0DBC780047EAA9 /* AuthenticationManager.swift in Sources */,
 				D0B592FA2C20E3390026D977 /* CycleMateApp.swift in Sources */,
+				D0C145B32DAAD4AB00674038 /* AuthProfileService.swift in Sources */,
 				D0CF02732D0DCFB700D0B15C /* AuthError.swift in Sources */,
 				D0C4CBF12D0DC0CB0047EAA9 /* UserDataFormView.swift in Sources */,
+				D0C145AF2DAA94F600674038 /* APIService.swift in Sources */,
 				D039C6F32CF4BB83000F6ACE /* FirstLaunchView.swift in Sources */,
 				D0C4CBED2D0DC06B0047EAA9 /* AuthenticationView.swift in Sources */,
 				D0CF02792D0E4B8600D0B15C /* ProfilePictureView.swift in Sources */,
 				D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */,
+				D0C145B12DAAA21000674038 /* AuthResponse.swift in Sources */,
 				D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */,
 				1EE3C6682D980A2800BD255A /* LocationSearchView.swift in Sources */,
 				D0CBC0992D0A4E80007513ED /* PageIndicator.swift in Sources */,
 				D0059B342D282F9800B3D100 /* MainTabView.swift in Sources */,
+				D0C145AD2DAA94D400674038 /* AuthenticationService.swift in Sources */,
 				D0059B242D282E0C00B3D100 /* CustomTabBar.swift in Sources */,
 				D0CBC09E2D0A4F6C007513ED /* FirstLaunchViewModel.swift in Sources */,
 				D0B5932A2C20E4400026D977 /* SplashScreenView.swift in Sources */,
@@ -998,6 +1036,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CycleMate/CycleMate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CycleMate/Preview Content\"";
@@ -1007,6 +1046,10 @@
 				INFOPLIST_FILE = CycleMate/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "CycleMate needs access to your camera to take profile pictures and capture cycling moments.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ycleMate needs access to your health data to track and analyze your cycling activities and provide personalized insights about your fitness progress.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CycleMate needs permission to save your cycling workouts and activities to Apple Health to help you maintain a complete health and fitness record.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map, track your cycling routes, and provide navigation even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map and track your cycling routes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1030,6 +1073,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CycleMate/CycleMate.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1040,6 +1084,10 @@
 				INFOPLIST_FILE = CycleMate/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "CycleMate needs access to your camera to take profile pictures and capture cycling moments.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ycleMate needs access to your health data to track and analyze your cycling activities and provide personalized insights about your fitness progress.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CycleMate needs permission to save your cycling workouts and activities to Apple Health to help you maintain a complete health and fitness record.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map, track your cycling routes, and provide navigation even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map and track your cycling routes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

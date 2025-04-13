@@ -117,7 +117,7 @@ struct ProfilePictureView: View {
                             Button {
                                 Task {
                                     if hasSelectedImage {
-                                        await viewModel.updateProfileImage(image: viewModel.userProfileImage!)
+                                        await viewModel.updateProfileImage(viewModel.userProfileImage!)
                                     }
                                     
                                     if !viewModel.showError {

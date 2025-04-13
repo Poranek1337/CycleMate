@@ -49,12 +49,8 @@ struct HomeView: View {
             ProfileView()
         }
         .task {
-            await authViewModel.fetchUser()
-            if !isCheckingImage {
-                isCheckingImage = true
-                try? await AuthenticationManager.shared.checkAndUpdateProfileImage()
-                isCheckingImage = false
-            }
+            // Sprawdź czy sesja jest aktualna
+            await authViewModel.checkSession()
         }
     }
 }

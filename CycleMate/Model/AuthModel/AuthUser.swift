@@ -44,6 +44,9 @@ struct AuthUser {
     /// The background color for the user's profile when no image is set
     var backgroundColor: Color?
     
+    /// The authentication token for the user
+    var token: String?
+    
     /// A computed property that returns the user's full name.
     var fullName: String {
         return [firstName, lastName].compactMap { $0 }.joined(separator: " ")

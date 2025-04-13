@@ -8,25 +8,38 @@ import SwiftUI
 /// A view that displays the splash screen and handles navigation to the appropriate view based on the authentication state.
 struct SplashScreenView: View {
     // MARK: - Properties
-    @EnvironmentObject var authViewModel: AuthViewModel
+    @StateObject private var authViewModel = AuthViewModel()
     @State private var offset: CGFloat = 0
     @State private var padding: CGFloat = 0
     @State private var showContent = false
+    @State private var isCheckingSession = true
     
     // MARK: - Body
     var body: some View {
         ZStack {
             Group {
-                if authViewModel.currentUser != nil {
-                    MainTabView()
-                        .background(Color.clear)
-                        .environmentObject(authViewModel)
-                } else {
-                    FirstLaunchView()
-                        .background(Color.clear)
+                if !isCheckingSession {
+                    if authViewModel.currentUser != nil {
+                        MainTabView()
+                            .background(Color.clear)
+                            .environmentObject(authViewModel)
+                    } else {
+                        FirstLaunchView()
+                            .background(Color.clear)
+                            .environmentObject(authViewModel)
+                    }
                 }
             }
             
+            splashContent
+        }
+        .onAppear {
+            checkSession()
+        }
+    }
+    
+    private var splashContent: some View {
+        ZStack {
             Color("second")
                 .edgesIgnoringSafeArea(.all)
                 .opacity(showContent ? 0 : 1)
@@ -44,17 +57,24 @@ struct SplashScreenView: View {
                 .edgesIgnoringSafeArea(.all)
                 .offset(y: offset)
                 .padding(.bottom, padding)
-                .onAppear {
-                    Task {
-                        try? await Task.sleep(nanoseconds: 500_000_000)
-                        
-                        withAnimation(.easeInOut(duration: 0.7)) {
-                            self.offset = geometry.size.height + 200
-                            self.padding = 100
-                            self.showContent = true
-                        }
-                    }
-                }
+            }
+        }
+    }
+    
+    private func checkSession() {
+        Task {
+            // Wait for minimum splash screen duration
+            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+            
+            // Check session
+            await authViewModel.checkSession()
+            
+            // Animate splash screen
+            withAnimation(.easeInOut(duration: 0.7)) {
+                self.offset = UIScreen.main.bounds.height + 200
+                self.padding = 100
+                self.showContent = true
+                self.isCheckingSession = false
             }
         }
     }
@@ -79,6 +99,5 @@ struct ArcShape: Shape {
 struct SplashScreenView_Previews: PreviewProvider {
     static var previews: some View {
         SplashScreenView()
-            .environmentObject(AuthViewModel())
     }
 }

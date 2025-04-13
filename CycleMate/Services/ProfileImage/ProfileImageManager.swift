@@ -7,24 +7,28 @@ import SwiftUI
 import CryptoKit
 import ImageIO
 import UniformTypeIdentifiers
+import Foundation
+import UIKit
+import FirebaseStorage
 
 class ProfileImageManager {
     static let shared = ProfileImageManager()
     
     private let fileManager = FileManager.default
     private let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    private let storage = Storage.storage().reference()
     
     private let compressionQuality: CGFloat = 0.8
-    private let imageSize = CGSize(width: 500, height: 500) // Standardized size
+    private let imageSize = CGSize(width: 500, height: 500)
 
-    private var skipChecksumVerification = false
-
+    private var checksumVerificationEnabled = true
+    
     private init() {
-        print(" ProfileImageManager initialized")
+        print("📸 ProfileImageManager initialized")
     }
     
     func setChecksumVerification(enabled: Bool) {
-        skipChecksumVerification = !enabled
+        checksumVerificationEnabled = enabled
     }
     
     private func generateChecksum(for data: Data) -> String {
@@ -41,78 +45,92 @@ class ProfileImageManager {
         return checksum1 == checksum2
     }
     
-    private func normalizeImage(_ image: UIImage) -> UIImage? {
-        print("🔄 Normalizing image...")
+    // MARK: - Firebase Storage Methods
+    func uploadProfileImage(_ image: UIImage, userId: String) async throws -> String {
+        print("📤 Starting upload with userId")
         
-        // Scale the image to standard size
-        let renderer = UIGraphicsImageRenderer(size: imageSize)
-        let normalizedImage = renderer.image { context in
-            // Clear background to ensure consistency
-            UIColor.clear.setFill()
-            context.fill(CGRect(origin: .zero, size: imageSize))
-            
-            // Draw image with aspect fit
-            let rect = CGRect(origin: .zero, size: imageSize)
-            image.draw(in: rect)
-        }
-        
-        return normalizedImage
-    }
-    
-    private func standardizedImageData(from image: UIImage) -> Data? {
-        guard let normalizedImage = normalizeImage(image) else { return nil }
-        
-        let data = NSMutableData()
-        guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, "public.jpeg" as CFString, 1, nil) else { return nil }
-        
-        // Remove all metadata
-        let cleanMetadata = [kCGImageDestinationLossyCompressionQuality: compressionQuality] as [CFString : Any]
-        
-        guard let cgImage = normalizedImage.cgImage else { return nil }
-        CGImageDestinationAddImage(destination, cgImage, cleanMetadata as CFDictionary)
-        guard CGImageDestinationFinalize(destination) else { return nil }
-        
-        return data as Data
-    }
-    
-    // Save image to local storage
-    func saveImageLocally(_ image: UIImage, forUserId userId: String) throws -> URL {
-        print(" Starting to save image locally for user: \(userId)")
-        let fileName = "profile_\(userId).jpg"
-        let fileURL = documentsPath.appendingPathComponent(fileName)
-        
-        guard let imageData = standardizedImageData(from: image) else {
-            print("❌ Failed to standardize image for local storage")
+        guard let normalizedImage = normalizeImage(image),
+              let imageData = standardizedImageData(from: normalizedImage) else {
             throw ImageError.compressionFailed
         }
         
-        print(" Writing image data to: \(fileURL.path)")
+        // Hash userId dla bezpieczeństwa
+        let hashedUserId = SHA256.hash(data: Data(userId.utf8))
+            .compactMap { String(format: "%02x", $0) }
+            .joined()
+        
+        let filename = "\(hashedUserId).jpg"
+        let imageRef = storage.child("profile_images/\(filename)")
+        
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        
+        do {
+            _ = try await imageRef.putDataAsync(imageData, metadata: metadata)
+            let downloadURL = try await imageRef.downloadURL()
+            
+            // Save locally after successful upload
+            try saveImageLocally(normalizedImage, withToken: userId)
+            
+            return downloadURL.absoluteString
+        } catch {
+            print("❌ Upload failed: \(error.localizedDescription)")
+            throw ImageError.uploadFailed
+        }
+    }
+    
+    // MARK: - Local Storage Methods
+    func saveImageLocally(_ image: UIImage, withToken token: String) throws -> URL {
+        print("💾 Saving image locally")
+        let hashedToken = SHA256.hash(data: Data(token.utf8))
+            .compactMap { String(format: "%02x", $0) }
+            .joined()
+        
+        let fileName = "\(hashedToken).jpg"
+        let fileURL = documentsPath.appendingPathComponent(fileName)
+        
+        guard let imageData = standardizedImageData(from: image) else {
+            throw ImageError.compressionFailed
+        }
+        
         try imageData.write(to: fileURL)
-        print("💾 Saved new profile image")
-        let savedChecksum = generateChecksum(for: imageData)
-        print("📝 Saved image checksum: \(savedChecksum)")
         return fileURL
     }
     
-    // Load image from local storage
-    func loadLocalImage(forUserId userId: String) -> UIImage? {
-        print(" Attempting to load local image for user: \(userId)")
-        let fileName = "profile_\(userId).jpg"
+    func loadLocalImage(withToken token: String) -> UIImage? {
+        let hashedToken = SHA256.hash(data: Data(token.utf8))
+            .compactMap { String(format: "%02x", $0) }
+            .joined()
+        
+        let fileName = "\(hashedToken).jpg"
         let fileURL = documentsPath.appendingPathComponent(fileName)
         
         guard let imageData = try? Data(contentsOf: fileURL) else {
-            print(" No local image found for user: \(userId)")
             return nil
         }
-        print(" Successfully loaded local image")
-        let loadedChecksum = generateChecksum(for: imageData)
-        print("📝 Loaded image checksum: \(loadedChecksum)")
         return UIImage(data: imageData)
+    }
+    
+    func removeLocalImage(withToken token: String) throws {
+        print(" Attempting to remove local image")
+        let hashedToken = SHA256.hash(data: Data(token.utf8))
+            .compactMap { String(format: "%02x", $0) }
+            .joined()
+        
+        let fileName = "\(hashedToken).jpg"
+        let fileURL = documentsPath.appendingPathComponent(fileName)
+        
+        if fileManager.fileExists(atPath: fileURL.path) {
+            try fileManager.removeItem(at: fileURL)
+            print("🗑️ Removed local image")
+        } else {
+            print(" No local image found to remove")
+        }
     }
     
     // Compare images using checksum verification
     func areImagesEqual(localImage: UIImage, remoteImage: UIImage) -> Bool {
-        if skipChecksumVerification {
+        if !checksumVerificationEnabled {
             print("🔓 Skipping checksum verification")
             return true
         }
@@ -146,23 +164,33 @@ class ProfileImageManager {
         return areEqual
     }
     
-    // Remove local image
-    func removeLocalImage(forUserId userId: String) throws {
-        print(" Attempting to remove local image for user: \(userId)")
-        let fileName = "profile_\(userId).jpg"
-        let fileURL = documentsPath.appendingPathComponent(fileName)
-        
-        if fileManager.fileExists(atPath: fileURL.path) {
-            try fileManager.removeItem(at: fileURL)
-            print("🗑️ Removed local image for user: \(userId)")
-        } else {
-            print(" No local image found to remove")
+    // MARK: - Helper Methods
+    private func normalizeImage(_ image: UIImage) -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(size: imageSize)
+        return renderer.image { context in
+            UIColor.clear.setFill()
+            context.fill(CGRect(origin: .zero, size: imageSize))
+            image.draw(in: CGRect(origin: .zero, size: imageSize))
         }
+    }
+    
+    private func standardizedImageData(from image: UIImage) -> Data? {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+        
+        let cleanMetadata = [kCGImageDestinationLossyCompressionQuality: compressionQuality] as [CFString : Any]
+        
+        guard let cgImage = image.cgImage else { return nil }
+        CGImageDestinationAddImage(destination, cgImage, cleanMetadata as CFDictionary)
+        guard CGImageDestinationFinalize(destination) else { return nil }
+        
+        return data as Data
     }
     
     enum ImageError: Error {
         case compressionFailed
         case saveFailed
         case loadFailed
+        case uploadFailed
     }
 }

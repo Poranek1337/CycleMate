@@ -20,7 +20,13 @@ enum AuthError: Error {
     case imageUploadFailed
     case emailVerificationFailed
     case emailVerificationTimeout
-    
+    case networkError(String)
+    case invalidResponse
+    case decodingError
+    case configurationError
+    case presentationError
+    case invalidCredential
+
     /// A description of the error.
     var description: String {
         switch self {
@@ -35,9 +41,12 @@ enum AuthError: Error {
         case .imageUploadFailed: return "Failed to upload image. Please try again."
         case .emailVerificationFailed: return "Failed to verify email. Please try again."
         case .emailVerificationTimeout: return "Email verification timed out. Please try again."
-
+        case .networkError(let message): return "Network error: \(message)"
+        case .invalidResponse: return "Invalid response from server"
+        case .decodingError: return "Error decoding server response"
+        case .configurationError: return "Configuration error occurred"
+        case .presentationError: return "Error presenting authentication view"
+        case .invalidCredential: return "Invalid credentials provided"
         }
     }
 }
-
-// End of file. No additional code.

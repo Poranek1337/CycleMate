@@ -13,7 +13,7 @@ struct ProfileInitialsView: View {
     var body: some View {
         if let user = user {
             Circle()
-                .fill(user.backgroundColor?.color ?? .gray)
+                .fill(user.backgroundColor.flatMap { ColorGenerator.hexStringToColor($0) } ?? .gray)
                 .frame(width: size, height: size)
                 .overlay(
                     Text(user.initials)
@@ -44,7 +44,7 @@ struct ProfileInitialsView: View {
         dateOfBirth: nil,
         provider: "email",
         isProfileCompleted: true,
-        backgroundColor: nil
+        backgroundColor: "#FF0000"
     )
     
     return Group {

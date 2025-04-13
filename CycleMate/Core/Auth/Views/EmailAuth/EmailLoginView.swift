@@ -221,7 +221,12 @@ struct EmailLoginView: View {
     
     /// Signs in the user with email and password.
     private func signInUser() async {
-        await viewModel.signInWithEmail()
+        do {
+            try await viewModel.signIn(email: viewModel.email, password: viewModel.password)
+        } catch {
+            viewModel.errorMessage = error.localizedDescription
+            viewModel.showError = true
+        }
     }
     
     /// Dismisses the card view with animation.

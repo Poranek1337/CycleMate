@@ -12,31 +12,34 @@ struct User: Identifiable, Codable, Equatable {
     let id: String
     
     /// The user's first name.
-    let firstName: String
+    var firstName: String
     
     /// The user's last name.
-    let lastName: String
+    var lastName: String
     
     /// The user's email address.
     let email: String
     
     /// The URL of the user's profile photo.
-    let photoURL: String
+    var photoURL: String
     
     /// The date the user was created.
     let createdAt: Date
     
     /// The user's date of birth.
-    let dateOfBirth: Date?
+    var dateOfBirth: Date?
     
     /// The authentication provider for the user.
     let provider: String
     
     /// A flag indicating if the user's profile is completed.
-    let isProfileCompleted: Bool
+    var isProfileCompleted: Bool
     
-    /// Add background color components
-    let backgroundColor: ColorComponents?
+    /// Background color
+    var backgroundColor: String?
+    
+    /// Authentication token
+    var token: String?
     
     /// A computed property that returns the user's full name.
     var fullName: String {
@@ -46,6 +49,14 @@ struct User: Identifiable, Codable, Equatable {
     /// A computed property that returns the user's initials.
     var initials: String {
         ColorGenerator.generateInitials(firstName: firstName, lastName: lastName)
+    }
+    
+    /// A computed property that returns the user's background color.
+    var color: Color? {
+        if let bgColor = backgroundColor {
+            return ColorGenerator.hexStringToColor(bgColor)
+        }
+        return nil
     }
     
     /// Custom decoder initialization
@@ -60,7 +71,8 @@ struct User: Identifiable, Codable, Equatable {
         self.dateOfBirth = try container.decodeIfPresent(Date.self, forKey: .dateOfBirth)
         self.provider = try container.decode(String.self, forKey: .provider)
         self.isProfileCompleted = try container.decode(Bool.self, forKey: .isProfileCompleted)
-        self.backgroundColor = try container.decodeIfPresent(ColorComponents.self, forKey: .backgroundColor)
+        self.backgroundColor = try container.decodeIfPresent(String.self, forKey: .backgroundColor)
+        self.token = try container.decodeIfPresent(String.self, forKey: .token)
     }
     
     /// Manual initialization
@@ -73,7 +85,8 @@ struct User: Identifiable, Codable, Equatable {
          dateOfBirth: Date?,
          provider: String,
          isProfileCompleted: Bool,
-         backgroundColor: ColorComponents? = nil) {
+         backgroundColor: String? = nil,
+         token: String? = nil) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -84,6 +97,7 @@ struct User: Identifiable, Codable, Equatable {
         self.provider = provider
         self.isProfileCompleted = isProfileCompleted
         self.backgroundColor = backgroundColor
+        self.token = token
     }
     
     /// Initializes a new instance of `User` from an `AuthUser`.
@@ -99,6 +113,7 @@ struct User: Identifiable, Codable, Equatable {
         self.provider = authUser.provider.rawValue
         self.isProfileCompleted = authUser.isProfileCompleted
         self.backgroundColor = nil
+        self.token = authUser.token
     }
     
     /// Coding keys for Codable conformance
@@ -113,21 +128,11 @@ struct User: Identifiable, Codable, Equatable {
         case provider
         case isProfileCompleted
         case backgroundColor
+        case token
     }
     
     /// Checks if two `User` instances are equal.
     static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id
-    }
-    
-    /// Color components struct
-    struct ColorComponents: Codable {
-        let red: CGFloat
-        let green: CGFloat
-        let blue: CGFloat
-        
-        var color: Color {
-            Color(.displayP3, red: red, green: green, blue: blue)
-        }
     }
 }
