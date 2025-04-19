@@ -3,7 +3,6 @@
 //  CycleMate
 //
 
-// Required imports
 import SwiftUI
 import MapLibre
 import CoreLocation
@@ -11,9 +10,15 @@ import UIKit
 
 // MARK: - Main View
 struct MapView: View {
-    // Properties
     @StateObject private var locationManager = LocationManager()
     @StateObject private var viewModel = MapViewModel()
+    @StateObject private var searchViewModel = LocationSearchViewModel()
+
+    @State private var isDrawerExpanded: Bool = false
+    @State private var isDrawerHalfExpanded: Bool = false
+    @FocusState private var isSearchFocused: Bool
+    
+    @State private var keyboardHeight: CGFloat = 0
     
     private var mapTilerKey: String {
         guard let key = Bundle.main.object(forInfoDictionaryKey: "MapTilerAPIKey") as? String else {
@@ -37,18 +42,32 @@ struct MapView: View {
                     userCourse: locationManager.userCourse,
                     isTrackingUser: viewModel.isTrackingUser,
                     cameraAltitude: viewModel.cameraAltitude,
-                    frame: geometry.frame(in: .global),
                     onMapInteraction: {
                         viewModel.handleMapInteraction()
-                    }
+                    },
+                    geocodingHits: viewModel.geocodingHits,
+                    selectedGeocodingHit: viewModel.selectedGeocodingHit,
+                    shouldCenterOnSelection: viewModel.shouldCenterOnSelection,
+                    boundingBox: viewModel.boundingBox
                 )
-                .edgesIgnoringSafeArea(.all)
+                .frame(width: geometry.size.width)
                 .ignoresSafeArea()
-                
                 VStack {
                     HStack {
                         Spacer()
-                        LocationSearchView()
+                        LocationSearchView(
+                            searchViewModel: searchViewModel,
+                            onEditingChanged: { active in
+                                isSearchFocused = active
+                                if active {
+                                    withAnimation {
+                                        isDrawerExpanded = true
+                                        isDrawerHalfExpanded = true
+                                    }
+                                }
+                            }
+                        )
+                        .focused($isSearchFocused)
                         Spacer()
                     }
                     Spacer().frame(height: 30)
@@ -65,7 +84,6 @@ struct MapView: View {
                                     .background(.ultraThinMaterial)
                                     .clipShape(Circle())
                             }
-                            
                             Menu {
                                 ForEach(MapViewModel.MapStyle.allCases, id: \.self) { style in
                                     Button(style.styleName) {
@@ -83,7 +101,31 @@ struct MapView: View {
                         }
                         .padding(.trailing, 10)
                     }
-                    Spacer()
+                    
+                    Drawer(
+                        isExpanded: $isDrawerExpanded,
+                        isHalfExpanded: $isDrawerHalfExpanded,
+                        minHeight: 70,
+                        halfHeight: geometry.size.height * 0.45,
+                        fullHeight: geometry.size.height * 0.87,
+                        keyboardHeight: keyboardHeight
+                    ) {
+                        LocationSearchCompletionsView(
+                            searchResults: searchViewModel.results,
+                            onSelect: { selectedHit in
+                                viewModel.handleSearchSelection(selectedHit)
+                                searchViewModel.selectResult(selectedHit)
+                                isSearchFocused = false
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                        isDrawerExpanded = false
+                                        isDrawerHalfExpanded = false
+                                    }
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -92,9 +134,54 @@ struct MapView: View {
             if locationManager.hasLocationPermission {
                 viewModel.isTrackingUser = true
             }
+            searchViewModel.onResultsUpdated = { hits in
+                viewModel.updateGeocodingHits(hits)
+                if !hits.isEmpty {
+                    withAnimation {
+                        isDrawerExpanded = true
+                        isDrawerHalfExpanded = true
+                    }
+                }
+            }
+            
+            NotificationCenter.default.addObserver(
+                forName: UIResponder.keyboardWillShowNotification,
+                object: nil,
+                queue: .main
+            ) { notification in
+                let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect ?? .zero
+                keyboardHeight = keyboardFrame.height
+            }
+            
+            NotificationCenter.default.addObserver(
+                forName: UIResponder.keyboardWillHideNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                keyboardHeight = 0
+            }
         }
         .onDisappear {
             locationManager.stopUpdatingLocation()
+        }
+
+        .onChange(of: searchViewModel.searchTextField) { _, newValue in
+            if newValue.isEmpty && !isSearchFocused {
+                withAnimation {
+                    isDrawerExpanded = false
+                    isDrawerHalfExpanded = false
+                }
+            }
+        }
+        .onChange(of: searchViewModel.selectedResult) { _, result in
+            if let _ = result {
+                withAnimation { isDrawerExpanded = false; isDrawerHalfExpanded = false }
+            }
+        }
+        .onChange(of: isDrawerExpanded) { _, expanded in
+            if !expanded {
+                searchViewModel.searchTextField = ""
+            }
         }
     }
 }
@@ -107,11 +194,14 @@ struct MapViewRepresentable: UIViewRepresentable {
     let userCourse: Double
     let isTrackingUser: Bool
     let cameraAltitude: Double
-    let frame: CGRect
     let onMapInteraction: () -> Void
+    let geocodingHits: [GeocodingHit]
+    let selectedGeocodingHit: GeocodingHit?
+    let shouldCenterOnSelection: Bool
+    let boundingBox: (min: CLLocationCoordinate2D, max: CLLocationCoordinate2D)?
     
     func makeUIView(context: Context) -> MLNMapView {
-        let mapView = MLNMapView(frame: frame)
+        let mapView = MLNMapView(frame: .zero)
         mapView.styleURL = URL(string: styleURL)
         
         mapView.showsUserLocation = true
@@ -119,23 +209,25 @@ struct MapViewRepresentable: UIViewRepresentable {
         mapView.minimumZoomLevel = 1
         mapView.maximumZoomLevel = 20
         mapView.setZoomLevel(10, animated: true)
-        
+
         mapView.logoView.isHidden = true
         mapView.compassView.isHidden = true
         mapView.attributionButton.isHidden = true
-        
+
         mapView.backgroundColor = .black
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
+
         context.coordinator.mapView = mapView
         context.coordinator.onMapInteraction = onMapInteraction
         mapView.delegate = context.coordinator
-        
+
         mapView.isRotateEnabled = true
         mapView.isScrollEnabled = true
         mapView.isPitchEnabled = true
         mapView.isZoomEnabled = true
-        
+
+        updateAnnotations(mapView)
+
         return mapView
     }
     
@@ -151,9 +243,55 @@ struct MapViewRepresentable: UIViewRepresentable {
             MLNMapView.animate(withDuration: 0.15, delay: 0, options: .curveLinear) {
                 uiView.setCamera(camera, animated: false)
             }
-        } else {
-            uiView.setUserTrackingMode(.none, animated: true) {}
+        } else if shouldCenterOnSelection, let selected = selectedGeocodingHit {
+            uiView.setUserTrackingMode(.none, animated: false) {}
+            let coordinate = CLLocationCoordinate2D(latitude: selected.point.lat, longitude: selected.point.lng)
+            let camera = MLNMapCamera(
+                lookingAtCenter: coordinate,
+                altitude: 600,
+                pitch: 30,
+                heading: 0
+            )
+            MLNMapView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                uiView.setCamera(camera, animated: false)
+            }
+        } else if let bbox = boundingBox {
+            uiView.setUserTrackingMode(.none, animated: false) {}
+            
+            let centerLat = (bbox.min.latitude + bbox.max.latitude) / 2
+            let centerLng = (bbox.min.longitude + bbox.max.longitude) / 2
+            let center = CLLocationCoordinate2D(latitude: centerLat, longitude: centerLng)
+            
+            let latDelta = abs(bbox.max.latitude - bbox.min.latitude)
+            let lngDelta = abs(bbox.max.longitude - bbox.min.longitude)
+            let maxDelta = max(latDelta, lngDelta)
+            let altitude = maxDelta * 111000 * 1.5
+            
+            let camera = MLNMapCamera(
+                lookingAtCenter: center,
+                altitude: altitude,
+                pitch: 0,
+                heading: 0
+            )
+            
+            MLNMapView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                uiView.setCamera(camera, animated: false)
+            }
         }
+
+        updateAnnotations(uiView)
+    }
+    
+    private func updateAnnotations(_ mapView: MLNMapView) {
+        mapView.removeAnnotations(mapView.annotations ?? [])
+        let annotations = geocodingHits.map { hit -> MLNPointAnnotation in
+            let annotation = MLNPointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(latitude: hit.point.lat, longitude: hit.point.lng)
+            annotation.title = hit.name
+            annotation.subtitle = [hit.street, hit.housenumber, hit.city, hit.country].compactMap { $0 }.joined(separator: ", ")
+            return annotation
+        }
+        mapView.addAnnotations(annotations)
     }
     
     func makeCoordinator() -> Coordinator {

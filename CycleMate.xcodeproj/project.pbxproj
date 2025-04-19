@@ -3,10 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E3EB99A2D9AAD4900E4BBDE /* LocationSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E3EB9992D9AAD4900E4BBDE /* LocationSearchViewModel.swift */; };
+		1ECE11B72D98318100D43227 /* LocationSearchCompletionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECE11B62D98318100D43227 /* LocationSearchCompletionsView.swift */; };
+		1ED43AAF2DB2AA8200AB8E9C /* GeocodingResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED43AAE2DB2AA8200AB8E9C /* GeocodingResponse.swift */; };
+		1ED43AB12DB2AABF00AB8E9C /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED43AB02DB2AABF00AB8E9C /* Configuration.swift */; };
+		1ED43AB32DB2AAFF00AB8E9C /* GeocodingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ED43AB22DB2AAFF00AB8E9C /* GeocodingService.swift */; };
 		1EE3C6682D980A2800BD255A /* LocationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE3C6672D980A2800BD255A /* LocationSearchView.swift */; };
 		D0059B242D282E0C00B3D100 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B232D282E0800B3D100 /* CustomTabBar.swift */; };
 		D0059B282D282EB100B3D100 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B272D282EAC00B3D100 /* HomeView.swift */; };
@@ -90,6 +95,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1E3EB9992D9AAD4900E4BBDE /* LocationSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchViewModel.swift; sourceTree = "<group>"; };
+		1ECE11B62D98318100D43227 /* LocationSearchCompletionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchCompletionsView.swift; sourceTree = "<group>"; };
+		1ED43AAE2DB2AA8200AB8E9C /* GeocodingResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeocodingResponse.swift; sourceTree = "<group>"; };
+		1ED43AB02DB2AABF00AB8E9C /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
+		1ED43AB22DB2AAFF00AB8E9C /* GeocodingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeocodingService.swift; sourceTree = "<group>"; };
 		1EE3C6672D980A2800BD255A /* LocationSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchView.swift; sourceTree = "<group>"; };
 		D0059B232D282E0800B3D100 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
 		D0059B272D282EAC00B3D100 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -140,6 +150,10 @@
 		D0F5F2352D333833000D6611 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		D0F5F2382D33DFBB000D6611 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		1E3EB9942D99662F00E4BBDE /* Drawer */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Drawer; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		D0B592F32C20E3390026D977 /* Frameworks */ = {
@@ -226,6 +240,7 @@
 				D01E646C2D907078005EDCDB /* SpeedometerView.swift */,
 				D0059B2B2D282ED400B3D100 /* MapView.swift */,
 				1EE3C6672D980A2800BD255A /* LocationSearchView.swift */,
+				1ECE11B62D98318100D43227 /* LocationSearchCompletionsView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -330,6 +345,7 @@
 		D0B593242C20E39F0026D977 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				1E3EB9942D99662F00E4BBDE /* Drawer */,
 				D0CF02752D0E0D7E00D0B15C /* Auth */,
 			);
 			path = Components;
@@ -346,6 +362,7 @@
 				D0C4CBDF2D0DBBB60047EAA9 /* Auth */,
 				D0B593282C20E4120026D977 /* Startup */,
 				D0B593272C20E3CE0026D977 /* Root */,
+				1ED43AB02DB2AABF00AB8E9C /* Configuration.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -357,6 +374,7 @@
 				D0CF02AF2D0F31C400D0B15C /* PickerModel */,
 				D0C4CBE22D0DBBE20047EAA9 /* AuthModel */,
 				D0CBC09A2D0A4E92007513ED /* WelcomeModel */,
+				1ED43AAE2DB2AA8200AB8E9C /* GeocodingResponse.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -455,6 +473,7 @@
 			children = (
 				D0F5F1E92D32E264000D6611 /* ProfileImage */,
 				D0C4CBE52D0DBC520047EAA9 /* Auth */,
+				1ED43AB22DB2AAFF00AB8E9C /* GeocodingService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -587,6 +606,7 @@
 			isa = PBXGroup;
 			children = (
 				D0F5F2382D33DFBB000D6611 /* MapViewModel.swift */,
+				1E3EB9992D9AAD4900E4BBDE /* LocationSearchViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -605,6 +625,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1E3EB9942D99662F00E4BBDE /* Drawer */,
 			);
 			name = CycleMate;
 			productName = CycleMate;
@@ -728,6 +751,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0059B382D28535700B3D100 /* User.swift in Sources */,
+				1ED43AAF2DB2AA8200AB8E9C /* GeocodingResponse.swift in Sources */,
 				D0F5F1F42D32F1D4000D6611 /* MonthlyChartComponent.swift in Sources */,
 				D0F5F1F22D32F1C1000D6611 /* StatsComponent.swift in Sources */,
 				D0C4CBE92D0DBCF00047EAA9 /* AuthViewModel.swift in Sources */,
@@ -736,6 +760,7 @@
 				D0CF02772D0E0D9000D0B15C /* AuthButton.swift in Sources */,
 				D0CBC0A32D0A5058007513ED /* OnboardingSlide.swift in Sources */,
 				D01E646D2D907078005EDCDB /* SpeedometerView.swift in Sources */,
+				1ED43AB12DB2AABF00AB8E9C /* Configuration.swift in Sources */,
 				D0B592FC2C20E3390026D977 /* ContentView.swift in Sources */,
 				D0059B282D282EB100B3D100 /* HomeView.swift in Sources */,
 				D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */,
@@ -751,6 +776,7 @@
 				D0B592FA2C20E3390026D977 /* CycleMateApp.swift in Sources */,
 				D0CF02732D0DCFB700D0B15C /* AuthError.swift in Sources */,
 				D0C4CBF12D0DC0CB0047EAA9 /* UserDataFormView.swift in Sources */,
+				1ED43AB32DB2AAFF00AB8E9C /* GeocodingService.swift in Sources */,
 				D039C6F32CF4BB83000F6ACE /* FirstLaunchView.swift in Sources */,
 				D0C4CBED2D0DC06B0047EAA9 /* AuthenticationView.swift in Sources */,
 				D0CF02792D0E4B8600D0B15C /* ProfilePictureView.swift in Sources */,
@@ -764,6 +790,8 @@
 				D0CBC09E2D0A4F6C007513ED /* FirstLaunchViewModel.swift in Sources */,
 				D0B5932A2C20E4400026D977 /* SplashScreenView.swift in Sources */,
 				D0F5F1E82D32B89D000D6611 /* ProfileInitialsView.swift in Sources */,
+				1ECE11B72D98318100D43227 /* LocationSearchCompletionsView.swift in Sources */,
+				1E3EB99A2D9AAD4900E4BBDE /* LocationSearchViewModel.swift in Sources */,
 				D0CF02B12D0F31D700D0B15C /* ImagePickerModel.swift in Sources */,
 				D0F5F2362D333836000D6611 /* LocationManager.swift in Sources */,
 			);
@@ -935,6 +963,8 @@
 				INFOPLIST_FILE = CycleMate/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "CycleMate needs access to your camera to take profile pictures and capture cycling moments.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map, track your cycling routes, and provide navigation even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map and track your cycling routes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -968,6 +998,8 @@
 				INFOPLIST_FILE = CycleMate/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSCameraUsageDescription = "CycleMate needs access to your camera to take profile pictures and capture cycling moments.";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map, track your cycling routes, and provide navigation even when the app is in the background.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CycleMate needs your location to show your position on the map and track your cycling routes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

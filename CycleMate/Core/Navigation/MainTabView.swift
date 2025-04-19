@@ -51,6 +51,9 @@ struct MainTabView: View {
                             .tag(Tab.calendar)
                     }
                     .environmentObject(authViewModel)
+                    .safeAreaInset(edge: .bottom) {
+                        Color.clear.frame(height: 50)
+                    }
                 }
                 .ignoresSafeArea()
                 .tabViewStyle(.page(indexDisplayMode: .never))
