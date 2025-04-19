@@ -15,7 +15,8 @@ class AuthViewModel: ObservableObject {
     private let userStorage: UserStorage
     private let authProfileService: AuthProfileService
     private let apiService: APIService
-    
+    private let mockAuthService = MockAuthenticationService()
+
     // MARK: - Published Properties
     @Published var userSession: FirebaseAuth.User?
     @Published var currentUser: User?
@@ -62,17 +63,22 @@ class AuthViewModel: ObservableObject {
                 self.userBackgroundColor = color
             }
         }
-        
+
         guard let token = userStorage.getToken() else {
             self.resetUserSession()
             return
         }
-        
+
+        if token == "MOCK_TOKEN" {
+            self.authToken = token
+            return
+        }
+
         do {
             let authResponse = try await authService.validateToken(token)
             self.authToken = authResponse.token
             userStorage.saveToken(authResponse.token)
-            
+
             if let user = self.currentUser {
                 userStorage.saveUserData(user)
             }
@@ -110,6 +116,28 @@ class AuthViewModel: ObservableObject {
     }
     
     func signIn(email: String, password: String) async throws {
+        if email == "test@test.com" && password == "123456" {
+            let authResponse = try await mockAuthService.signIn(email: email, password: password)
+            let mockUser = User(
+                id: String(authResponse.userId),
+                firstName: "Test",
+                lastName: "User",
+                email: email,
+                photoURL: "",
+                createdAt: Date(),
+                dateOfBirth: nil,
+                provider: "email",
+                isProfileCompleted: true,
+                backgroundColor: "#90caf9",
+                token: authResponse.token
+            )
+            self.currentUser = mockUser
+            self.userBackgroundColor = ColorGenerator.hexStringToColor(mockUser.backgroundColor ?? "#90caf9")
+            userStorage.saveToken(authResponse.token)
+            userStorage.saveUserData(mockUser)
+            return
+        }
+
         try await handleSignIn(email: email, password: password)
     }
     
