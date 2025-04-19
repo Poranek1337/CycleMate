@@ -13,7 +13,6 @@ struct HomeView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
-                // Header Section
                 HStack {
                     VStack(alignment: .leading) {
                         Text("Hi, \(authViewModel.currentUser?.firstName ?? "User")!")
@@ -49,7 +48,6 @@ struct HomeView: View {
             ProfileView()
         }
         .task {
-            // Sprawdź czy sesja jest aktualna
             await authViewModel.checkSession()
         }
     }

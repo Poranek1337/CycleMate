@@ -14,6 +14,10 @@
 		D0059B342D282F9800B3D100 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B332D282F9500B3D100 /* MainTabView.swift */; };
 		D0059B382D28535700B3D100 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B372D28535400B3D100 /* User.swift */; };
 		D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */; };
+		D01D2CEA2DAD810900180416 /* AuthenticationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01D2CE92DAD810700180416 /* AuthenticationProtocol.swift */; };
+		D01D2CEE2DAD814200180416 /* SocialAuthenticationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01D2CED2DAD814000180416 /* SocialAuthenticationProtocol.swift */; };
+		D01D2CF02DAD815C00180416 /* UserStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01D2CEF2DAD815700180416 /* UserStorageProtocol.swift */; };
+		D01D2CF22DAD818F00180416 /* UserStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01D2CF12DAD818D00180416 /* UserStorage.swift */; };
 		D01E646D2D907078005EDCDB /* SpeedometerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01E646C2D907078005EDCDB /* SpeedometerView.swift */; };
 		D039C6F32CF4BB83000F6ACE /* FirstLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D039C6F22CF4BB83000F6ACE /* FirstLaunchView.swift */; };
 		D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06BC1C72D2C3DD100E504C8 /* PasswordResetView.swift */; };
@@ -112,6 +116,10 @@
 		D0059B332D282F9500B3D100 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		D0059B372D28535400B3D100 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailSignUpView.swift; sourceTree = "<group>"; };
+		D01D2CE92DAD810700180416 /* AuthenticationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationProtocol.swift; sourceTree = "<group>"; };
+		D01D2CED2DAD814000180416 /* SocialAuthenticationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialAuthenticationProtocol.swift; sourceTree = "<group>"; };
+		D01D2CEF2DAD815700180416 /* UserStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStorageProtocol.swift; sourceTree = "<group>"; };
+		D01D2CF12DAD818D00180416 /* UserStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStorage.swift; sourceTree = "<group>"; };
 		D01E46F62DAB227A007A55CC /* CycleMate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CycleMate.entitlements; sourceTree = "<group>"; };
 		D01E646C2D907078005EDCDB /* SpeedometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedometerView.swift; sourceTree = "<group>"; };
 		D039C6F22CF4BB83000F6ACE /* FirstLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchView.swift; sourceTree = "<group>"; };
@@ -277,6 +285,16 @@
 				D0059B392D2B4C2B00B3D100 /* EmailSignUpView.swift */,
 			);
 			path = EmailAuth;
+			sourceTree = "<group>";
+		};
+		D01D2CE82DAD80E000180416 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				D01D2CEF2DAD815700180416 /* UserStorageProtocol.swift */,
+				D01D2CED2DAD814000180416 /* SocialAuthenticationProtocol.swift */,
+				D01D2CE92DAD810700180416 /* AuthenticationProtocol.swift */,
+			);
+			path = Protocols;
 			sourceTree = "<group>";
 		};
 		D08908432D9ABB8000784DD6 /* Views */ = {
@@ -458,7 +476,6 @@
 				D0059B292D282EBC00B3D100 /* Map */,
 				D0059B252D282E9D00B3D100 /* Home */,
 				D0059B222D282E0100B3D100 /* Navigation */,
-				D0CF027E2D0E5ACF00D0B15C /* Camera */,
 				D0C4CBDF2D0DBBB60047EAA9 /* Auth */,
 				D0B593282C20E4120026D977 /* Startup */,
 				D0B593272C20E3CE0026D977 /* Root */,
@@ -497,6 +514,7 @@
 		D0C145A82DAA944D00674038 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D01D2CF12DAD818D00180416 /* UserStorage.swift */,
 				D0C145B42DAAD50400674038 /* GoogleAuthService.swift */,
 				D0C145B22DAAD4A900674038 /* AuthProfileService.swift */,
 				D0C145AE2DAA94F500674038 /* APIService.swift */,
@@ -505,17 +523,10 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		D0C145A92DAA946F00674038 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
 		D0C4CBDF2D0DBBB60047EAA9 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
-				D0C145A92DAA946F00674038 /* Extensions */,
+				D01D2CE82DAD80E000180416 /* Protocols */,
 				D0C145A82DAA944D00674038 /* Services */,
 				D0F5F1E42D32B433000D6611 /* Utils */,
 				D0C4CBE12D0DBBC80047EAA9 /* ViewModel */,
@@ -603,37 +614,6 @@
 				D0CF027C2D0E531000D0B15C /* ViewModifiers.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		D0CF027E2D0E5ACF00D0B15C /* Camera */ = {
-			isa = PBXGroup;
-			children = (
-				D0CF02852D0E5B5F00D0B15C /* Models */,
-				D0CF02822D0E5B2F00D0B15C /* Views */,
-				D0CF02802D0E5B0D00D0B15C /* ViewModels */,
-			);
-			path = Camera;
-			sourceTree = "<group>";
-		};
-		D0CF02802D0E5B0D00D0B15C /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		D0CF02822D0E5B2F00D0B15C /* Views */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		D0CF02852D0E5B5F00D0B15C /* Models */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		D0CF02AA2D0F314600D0B15C /* Components */ = {
@@ -832,6 +812,7 @@
 				D0B592FC2C20E3390026D977 /* ContentView.swift in Sources */,
 				D0C145B52DAAD50600674038 /* GoogleAuthService.swift in Sources */,
 				D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */,
+				D01D2CEE2DAD814200180416 /* SocialAuthenticationProtocol.swift in Sources */,
 				D0CF02AC2D0F315900D0B15C /* ImagePickerView.swift in Sources */,
 				D0C4CBE42D0DBC070047EAA9 /* AuthUser.swift in Sources */,
 				D0CF027D2D0E531000D0B15C /* ViewModifiers.swift in Sources */,
@@ -851,6 +832,7 @@
 				D0CF02792D0E4B8600D0B15C /* ProfilePictureView.swift in Sources */,
 				D0059B3A2D2B4C3100B3D100 /* EmailSignUpView.swift in Sources */,
 				D0C145B12DAAA21000674038 /* AuthResponse.swift in Sources */,
+				D01D2CF22DAD818F00180416 /* UserStorage.swift in Sources */,
 				D06BC1C82D2C3DD500E504C8 /* PasswordResetView.swift in Sources */,
 				1EE3C6682D980A2800BD255A /* LocationSearchView.swift in Sources */,
 				D0CBC0992D0A4E80007513ED /* PageIndicator.swift in Sources */,
@@ -863,11 +845,13 @@
 				D0CF02B12D0F31D700D0B15C /* ImagePickerModel.swift in Sources */,
 				D0F5F2362D333836000D6611 /* LocationManager.swift in Sources */,
 				D089085D2D9ABB8000784DD6 /* ProfileView.swift in Sources */,
+				D01D2CF02DAD815C00180416 /* UserStorageProtocol.swift in Sources */,
 				D089085F2D9ABB8000784DD6 /* StatisticCardView.swift in Sources */,
 				D08908602D9ABB8000784DD6 /* BikesComponent.swift in Sources */,
 				D08908612D9ABB8000784DD6 /* RouteCardView.swift in Sources */,
 				D08908622D9ABB8000784DD6 /* MapPreviewComponent.swift in Sources */,
 				D08908632D9ABB8000784DD6 /* MonthlyChartComponent.swift in Sources */,
+				D01D2CEA2DAD810900180416 /* AuthenticationProtocol.swift in Sources */,
 				D08908642D9ABB8000784DD6 /* ProfileHeaderView.swift in Sources */,
 				D08908662D9ABB8000784DD6 /* StatsGridView.swift in Sources */,
 				D08908672D9ABB8000784DD6 /* CounterAnimation.swift in Sources */,

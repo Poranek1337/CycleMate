@@ -26,6 +26,7 @@ enum AuthError: Error {
     case configurationError
     case presentationError
     case invalidCredential
+    case unauthorizedError
 
     /// A description of the error.
     var description: String {
@@ -47,6 +48,7 @@ enum AuthError: Error {
         case .configurationError: return "Configuration error occurred"
         case .presentationError: return "Error presenting authentication view"
         case .invalidCredential: return "Invalid credentials provided"
+        case .unauthorizedError: return "Unauthorized access. Please log in again."
         }
     }
 }

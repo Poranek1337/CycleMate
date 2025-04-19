@@ -54,7 +54,6 @@ class ProfileImageManager {
             throw ImageError.compressionFailed
         }
         
-        // Hash userId dla bezpieczeństwa
         let hashedUserId = SHA256.hash(data: Data(userId.utf8))
             .compactMap { String(format: "%02x", $0) }
             .joined()
@@ -69,7 +68,6 @@ class ProfileImageManager {
             _ = try await imageRef.putDataAsync(imageData, metadata: metadata)
             let downloadURL = try await imageRef.downloadURL()
             
-            // Save locally after successful upload
             try saveImageLocally(normalizedImage, withToken: userId)
             
             return downloadURL.absoluteString

@@ -7,15 +7,51 @@
 
 import SwiftUI
 import FirebaseAuth
+import Foundation
 
 class AuthProfileService {
     static let shared = AuthProfileService()
-    private let authService = AuthenticationService()
     
     // MARK: - Profile Management
-    func updateProfileImage(_ image: UIImage, for userId: String) async throws -> String {
-        let profileImageManager = ProfileImageManager.shared
-        return try await profileImageManager.uploadProfileImage(image, userId: userId)
+    func updateProfileImage(_ image: UIImage, token: String) async throws -> String {
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BackendBaseURL") as? String else {
+            throw AuthError.networkError("Missing base URL configuration")
+        }
+        
+        let endpoint = "\(baseURL)/api/auth/profile/image"
+        
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            throw AuthError.imageProcessingFailed
+        }
+        
+        var request = URLRequest(url: URL(string: endpoint)!)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        var body = Data()
+        body.append("--\(boundary)\r\n")
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n")
+        body.append("Content-Type: image/jpeg\r\n\r\n")
+        body.append(imageData)
+        body.append("\r\n--\(boundary)--\r\n")
+        
+        request.httpBody = body
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw AuthError.imageUploadFailed
+        }
+        
+        guard let imageUrl = try? JSONDecoder().decode(String.self, from: data) else {
+            throw AuthError.invalidResponse
+        }
+        
+        return imageUrl
     }
     
     func completeUserProfile(userId: String, firstName: String, lastName: String, dateOfBirth: Date, authToken: String?) async throws -> User {
@@ -65,7 +101,8 @@ class AuthProfileService {
             dateOfBirth: dateOfBirth,
             provider: "email",
             isProfileCompleted: profileData.profileCompleted,
-            backgroundColor: profileData.backgroundColor
+            backgroundColor: profileData.backgroundColor,
+            token: authToken
         )
     }
     
@@ -83,6 +120,14 @@ class AuthProfileService {
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
         
         return try await URLSession.shared.data(for: request)
+    }
+}
+
+extension Data {
+    mutating func append(_ string: String) {
+        if let data = string.data(using: .utf8) {
+            self.append(data)
+        }
     }
 }
 

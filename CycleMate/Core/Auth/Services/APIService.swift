@@ -7,39 +7,64 @@
 
 import Foundation
 
-class APIService {
+class APIService: AuthenticationProtocol {
     private let baseURL: String
     
     init() {
-        self.baseURL = Bundle.main.object(forInfoDictionaryKey: "BackendBaseURL") as? String ?? ""
+        guard let url = Bundle.main.object(forInfoDictionaryKey: "BackendBaseURL") as? String else {
+            fatalError("BackendBaseURL not found in Info.plist")
+        }
+        self.baseURL = url
     }
     
-    // MARK: - Authentication
-    func createUser(registrationData: [String: Any]) async throws -> AuthResponse {
+    // MARK: - Request Methods
+    func signIn(email: String, password: String) async throws -> AuthResponse {
         return try await performRequest(
-            endpoint: "/auth/register",
+            endpoint: "/api/auth/login",
             method: "POST",
-            body: registrationData
+            body: ["email": email, "password": password]
         )
     }
     
-    func signIn(email: String, password: String) async throws -> AuthResponse {
-        let loginData: [String: Any] = [
-            "email": email,
-            "password": password
-        ]
+    func signUp(email: String, password: String) async throws -> AuthResponse {
         return try await performRequest(
-            endpoint: "/auth/login",
+            endpoint: "/api/auth/register",
             method: "POST",
-            body: loginData
+            body: ["email": email, "password": password]
         )
     }
     
     func validateToken(_ token: String) async throws -> AuthResponse {
         return try await performRequest(
-            endpoint: "/auth/validate",
+            endpoint: "/api/auth/validate",
             method: "POST",
             token: token
+        )
+    }
+    
+    func createUser(registrationData: [String: Any]) async throws -> AuthResponse {
+        return try await performRequest(
+            endpoint: "/api/auth/register",
+            method: "POST",
+            body: registrationData
+        )
+    }
+    
+    // MARK: - Google Auth
+    func authenticateWithGoogle(request: GoogleAuthRequest) async throws -> AuthResponse {
+        print("📡 Sending Google auth request")
+        
+        return try await performRequest(
+            endpoint: "/oauth2/google/token",
+            method: "POST",
+            body: [
+                "token": request.token,
+                "email": request.email
+            ],
+            headers: [
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            ]
         )
     }
     
@@ -48,15 +73,26 @@ class APIService {
         endpoint: String,
         method: String,
         body: [String: Any]? = nil,
-        token: String? = nil
+        token: String? = nil,
+        headers: [String: String]? = nil
     ) async throws -> AuthResponse {
         guard let url = URL(string: "\(baseURL)\(endpoint)") else {
-            throw AuthError.networkError("Invalid URL")
+            throw AuthError.networkError("Invalid URL: \(baseURL)\(endpoint)")
         }
+        
+        print("🌐 Making request to: \(url.absoluteString)")
         
         var request = URLRequest(url: url)
         request.httpMethod = method
+        
+        // Dodaj domyślne nagłówki
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Dodaj dodatkowe nagłówki
+        headers?.forEach { key, value in
+            request.setValue(value, forHTTPHeaderField: key)
+        }
         
         if let token = token {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -64,11 +100,7 @@ class APIService {
         
         if let body = body {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
-        }
-        
-        print("📡 Sending request to: \(endpoint)")
-        if let body = body {
-            print("📦 Body: \(body)")
+            print("📦 Request body: \(body)")
         }
         
         let (data, response) = try await URLSession.shared.data(for: request)

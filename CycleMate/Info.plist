@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BackendBaseURL</key>
-	<string>http://localhost:8080/api</string>
+	<string>http://localhost:8080/</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

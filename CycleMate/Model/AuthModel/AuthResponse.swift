@@ -1,20 +1,26 @@
-//
-//  AuthResponse.swift
-//  CycleMate
-//
-//  Created by Poranek on 14/12/2024.
-//
-
 import Foundation
 
-/// A model representing the response from authentication endpoints
 struct AuthResponse: Codable {
-    /// The unique identifier of the authenticated user
     let userId: Int
-    
-    /// The user's email address
     let email: String
-    
-    /// The authentication token
     let token: String
+    
+    enum CodingKeys: String, CodingKey {
+        case userId = "userId"
+        case email
+        case token
+    }
+}
+
+// Dodatkowe modele do komunikacji z backendem
+struct GoogleAuthRequest: Codable {
+    let token: String
+    let email: String
+}
+
+struct GoogleUserInfo: Codable {
+    let email: String
+    let givenName: String
+    let familyName: String
+    let picture: String?
 }

@@ -5,8 +5,17 @@ import FirebaseAuth
 import FirebaseFirestore
 import Combine
 
+// Existing code ...
+
 @MainActor
 class AuthViewModel: ObservableObject {
+    // MARK: - Dependencies
+    private let authService: APIService
+    private let googleAuthService: GoogleAuthService
+    private let userStorage: UserStorage
+    private let authProfileService: AuthProfileService
+    private let apiService: APIService
+    
     // MARK: - Published Properties
     @Published var userSession: FirebaseAuth.User?
     @Published var currentUser: User?
@@ -16,6 +25,8 @@ class AuthViewModel: ObservableObject {
     @Published var showUserDataForm = false
     @Published var userProfileImage: UIImage?
     @Published var userBackgroundColor: Color?
+    
+    // MARK: - Form Properties
     @Published var email = ""
     @Published var password = ""
     @Published var firstName = ""
@@ -23,16 +34,20 @@ class AuthViewModel: ObservableObject {
     @Published var dateOfBirth = Date()
     @Published private var authToken: String?
     
-    // MARK: - Services
-    private let authService = AuthenticationService()
-    private let apiService = APIService()
-    private let authProfileService = AuthProfileService.shared
-    private let googleAuthService = GoogleAuthService.shared
-    private var cancellables = Set<AnyCancellable>()
-    
     // MARK: - Initialization
-    init() {
-        print("📱 AuthViewModel initialized")
+    init(
+        authService: APIService = APIService(),
+        googleAuthService: GoogleAuthService = GoogleAuthService.shared,
+        userStorage: UserStorage = UserStorage(),
+        authProfileService: AuthProfileService = AuthProfileService.shared,
+        apiService: APIService = APIService()
+    ) {
+        self.authService = authService
+        self.googleAuthService = googleAuthService
+        self.userStorage = userStorage
+        self.authProfileService = authProfileService
+        self.apiService = apiService
+        
         Task {
             await checkSession()
         }
@@ -40,7 +55,7 @@ class AuthViewModel: ObservableObject {
     
     // MARK: - Session Management
     func checkSession() async {
-        if let savedUser = authService.loadUserData() {
+        if let savedUser = userStorage.loadUserData() {
             self.currentUser = savedUser
             if let backgroundColor = savedUser.backgroundColor,
                let color = ColorGenerator.hexStringToColor(backgroundColor) {
@@ -48,18 +63,18 @@ class AuthViewModel: ObservableObject {
             }
         }
         
-        guard let token = authService.getToken() else {
+        guard let token = userStorage.getToken() else {
             self.resetUserSession()
             return
         }
         
         do {
-            let authResponse = try await apiService.validateToken(token)
+            let authResponse = try await authService.validateToken(token)
             self.authToken = authResponse.token
-            authService.saveToken(authResponse.token)
+            userStorage.saveToken(authResponse.token)
             
             if let user = self.currentUser {
-                authService.saveUserData(user)
+                userStorage.saveUserData(user)
             }
         } catch {
             print("❌ Session validation failed: \(error)")
@@ -98,31 +113,39 @@ class AuthViewModel: ObservableObject {
         try await handleSignIn(email: email, password: password)
     }
     
+    // MARK: - Google Sign In
+    @MainActor
     func signInWithGoogle() async throws {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first,
-              let rootViewController = window.rootViewController else {
-            throw AuthError.presentationError
-        }
-        
-        let user = try await googleAuthService.signIn(presenting: rootViewController)
-        self.currentUser = user
-        self.userBackgroundColor = ColorGenerator.hexStringToColor(user.backgroundColor ?? "")
-        authService.saveUserData(user)
-        
-        if let imageUrl = URL(string: user.photoURL),
-           let imageData = try? Data(contentsOf: imageUrl),
-           let profileImage = UIImage(data: imageData) {
-            self.userProfileImage = profileImage
+        do {
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let window = windowScene.windows.first,
+                  let rootViewController = window.rootViewController else {
+                throw AuthError.presentationError
+            }
+            
+            let user = try await googleAuthService.signIn(presenting: rootViewController)
+            self.currentUser = user
+            self.userBackgroundColor = ColorGenerator.hexStringToColor(user.backgroundColor ?? "")
+            
+            userStorage.saveToken(user.token ?? "")
+            userStorage.saveUserData(user)
+            
+            if let imageUrl = URL(string: user.photoURL),
+               let imageData = try? Data(contentsOf: imageUrl),
+               let profileImage = UIImage(data: imageData) {
+                self.userProfileImage = profileImage
+            }
+        } catch {
+            handleError(error)
         }
     }
-    
+
     // MARK: - Profile Management
     func updateProfileImage(_ image: UIImage) async {
         do {
             guard let currentUser = currentUser,
-                  let token = currentUser.token else { 
-                throw AuthError.userNotFound 
+                  let token = currentUser.token else {
+                throw AuthError.userNotFound
             }
             
             let imageUrl = try await authProfileService.updateProfileImage(image, token: token)
@@ -132,7 +155,7 @@ class AuthViewModel: ObservableObject {
             
             self.currentUser = updatedUser
             self.userProfileImage = image
-            authService.saveUserData(updatedUser)
+            userStorage.saveUserData(updatedUser)
         } catch {
             self.handleError(error)
         }
@@ -150,20 +173,20 @@ class AuthViewModel: ObservableObject {
         )
         
         self.currentUser = updatedUser
-        authService.saveUserData(updatedUser)
+        userStorage.saveUserData(updatedUser)
     }
     
     // MARK: - Helper Methods
     private func resetUserSession() {
         self.currentUser = nil
         self.authToken = nil
-        authService.removeToken()
-        authService.removeUserData()
+        userStorage.removeToken()
+        userStorage.removeUserData()
     }
     
     private func setupUserSession(authResponse: AuthResponse, colorHex: String) {
         self.authToken = authResponse.token
-        authService.saveToken(authResponse.token)
+        userStorage.saveToken(authResponse.token)
         
         let user = User(
             id: String(authResponse.userId),
@@ -181,7 +204,7 @@ class AuthViewModel: ObservableObject {
         self.currentUser = user
         self.userBackgroundColor = ColorGenerator.hexStringToColor(colorHex)
         self.showUserDataForm = false
-        authService.saveUserData(user)
+        userStorage.saveUserData(user)
     }
     
     private func handleError(_ error: Error) {
@@ -264,8 +287,8 @@ class AuthViewModel: ObservableObject {
             self.userBackgroundColor = color
         }
         
-        authService.saveToken(authResponse.token)
-        authService.saveUserData(user)
+        userStorage.saveToken(authResponse.token)
+        userStorage.saveUserData(user)
     }
 
     func resetErrors() {
@@ -292,3 +315,5 @@ class AuthViewModel: ObservableObject {
         }
     }
 }
+
+// Existing code ...
