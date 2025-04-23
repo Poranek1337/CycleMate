@@ -10,6 +10,7 @@ import SwiftUI
 struct ProfileImageView: View {
     let user: User?
     let size: CGFloat
+    @State private var profileImage: UIImage?
     
     init(user: User?, size: CGFloat = 50) {
         self.user = user
@@ -19,23 +20,42 @@ struct ProfileImageView: View {
     var body: some View {
         Group {
             if let user = user {
-                if !user.photoURL.isEmpty {
-                    if let token = user.token,
-                       let localImage = ProfileImageManager.shared.loadLocalImage(withToken: token) {
-                        Image(uiImage: localImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: size, height: size)
-                            .clipShape(Circle())
-                    } else {
-                        AsyncImage(url: URL(string: user.photoURL)) { image in
+                if let image = profileImage {
+                    // Wyświetl załadowane zdjęcie
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .clipShape(Circle())
+                } else if !user.photoURL.isEmpty {
+                    // Próbuj załadować zdjęcie z cache lub URL
+                    AsyncImage(url: URL(string: user.photoURL)) { phase in
+                        switch phase {
+                        case .success(let image):
                             image
                                 .resizable()
-                                .scaledToFit()
+                                .scaledToFill()
                                 .frame(width: size, height: size)
                                 .clipShape(Circle())
-                        } placeholder: {
+                                .onAppear {
+                                    // Zapisz zdjęcie do cache przy pierwszym załadowaniu
+                                    if let token = user.token,
+                                       let uiImage = image.asUIImage() {
+                                        Task {
+                                            try? ProfileImageManager.shared.saveImageLocally(uiImage, withToken: token)
+                                        }
+                                    }
+                                }
+                        case .empty, .failure:
                             ProfileInitialsView(user: user, size: size)
+                        @unknown default:
+                            ProfileInitialsView(user: user, size: size)
+                        }
+                    }
+                    .task {
+                        // Próbuj załadować z lokalnego cache
+                        if let token = user.token {
+                            profileImage = ProfileImageManager.shared.loadLocalImage(withToken: token)
                         }
                     }
                 } else {
@@ -49,12 +69,21 @@ struct ProfileImageView: View {
     }
 }
 
+// Helper do konwersji Image na UIImage
+extension Image {
+    @MainActor
+    func asUIImage() -> UIImage? {
+        let renderer = ImageRenderer(content: self)
+        return renderer.uiImage
+    }
+}
+
 #Preview {
     let sampleUser = User(
         id: "preview-id",
         firstName: "John",
         lastName: "Doe",
-        email: "John@example.com",
+        email: "john@example.com",
         photoURL: "",
         createdAt: Date(),
         dateOfBirth: nil,

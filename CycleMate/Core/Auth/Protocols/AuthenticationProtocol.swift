@@ -12,5 +12,4 @@ protocol AuthenticationProtocol {
     func signUp(email: String, password: String) async throws -> AuthResponse
     func validateToken(_ token: String) async throws -> AuthResponse
     func createUser(registrationData: [String: Any]) async throws -> AuthResponse
-    func authenticateWithGoogle(request: GoogleAuthRequest) async throws -> AuthResponse
 }

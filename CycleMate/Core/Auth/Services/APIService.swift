@@ -37,8 +37,12 @@ class APIService: AuthenticationProtocol {
     func validateToken(_ token: String) async throws -> AuthResponse {
         return try await performRequest(
             endpoint: "/api/auth/validate",
-            method: "POST",
-            token: token
+            method: "GET",
+            token: token,
+            headers: [
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            ]
         )
     }
     
@@ -47,24 +51,6 @@ class APIService: AuthenticationProtocol {
             endpoint: "/api/auth/register",
             method: "POST",
             body: registrationData
-        )
-    }
-    
-    // MARK: - Google Auth
-    func authenticateWithGoogle(request: GoogleAuthRequest) async throws -> AuthResponse {
-        print("📡 Sending Google auth request")
-        
-        return try await performRequest(
-            endpoint: "/oauth2/google/token",
-            method: "POST",
-            body: [
-                "token": request.token,
-                "email": request.email
-            ],
-            headers: [
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            ]
         )
     }
     
@@ -118,6 +104,7 @@ class APIService: AuthenticationProtocol {
             throw AuthError.networkError("Server responded with status: \(httpResponse.statusCode)")
         }
         
-        return try JSONDecoder().decode(AuthResponse.self, from: data)
+        let decoder = JSONDecoder()
+        return try decoder.decode(AuthResponse.self, from: data)
     }
 }

@@ -109,29 +109,7 @@ struct AuthenticationView: View {
                             systemImage: "g.circle.fill",
                             style: .outlined
                         ) {
-                            Task {
-                                do {
-                                    print("🔵 Starting Google sign in")
-                                    try await viewModel.signInWithGoogle()
-                                    
-                                    if let user = Auth.auth().currentUser {
-                                        let userRef = Firestore.firestore().collection("users").document(user.uid)
-                                        let document = try await userRef.getDocument()
-                                        
-                                        if document.exists {
-                                            print("✅ Existing user found, loading profile")
-                                            withAnimation {
-                                                onSuccessfulAuth()
-                                                dismissCard()
-                                            }
-                                        }
-                                    }
-                                } catch {
-                                    print("❌ Google Sign In failed: \(error)")
-                                    viewModel.errorMessage = error.localizedDescription
-                                    viewModel.showError = true
-                                }
-                            }
+                           // Google login
                         }
                     }
                 }

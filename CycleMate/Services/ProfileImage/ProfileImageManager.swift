@@ -9,18 +9,14 @@ import ImageIO
 import UniformTypeIdentifiers
 import Foundation
 import UIKit
-import FirebaseStorage
 
 class ProfileImageManager {
     static let shared = ProfileImageManager()
     
     private let fileManager = FileManager.default
     private let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    private let storage = Storage.storage().reference()
-    
     private let compressionQuality: CGFloat = 0.8
     private let imageSize = CGSize(width: 500, height: 500)
-
     private var checksumVerificationEnabled = true
     
     private init() {
@@ -31,49 +27,80 @@ class ProfileImageManager {
         checksumVerificationEnabled = enabled
     }
     
-    private func generateChecksum(for data: Data) -> String {
-        let hash = SHA256.hash(data: data)
-        return hash.compactMap { String(format: "%02x", $0) }.joined()
-    }
-    
-    private func compareImageData(_ data1: Data, _ data2: Data) -> Bool {
-        let checksum1 = generateChecksum(for: data1)
-        let checksum2 = generateChecksum(for: data2)
-        print("🔍 Checksum comparison:")
-        print("   Local: \(checksum1)")
-        print("   Remote: \(checksum2)")
-        return checksum1 == checksum2
-    }
-    
-    // MARK: - Firebase Storage Methods
-    func uploadProfileImage(_ image: UIImage, userId: String) async throws -> String {
-        print("📤 Starting upload with userId")
+    // MARK: - Image Upload
+    func uploadProfileImage(_ image: UIImage, token: String) async throws -> String {
+        print("\n🔄 Rozpoczęcie procesu wysyłania zdjęcia...")
         
-        guard let normalizedImage = normalizeImage(image),
-              let imageData = standardizedImageData(from: normalizedImage) else {
+        guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "BackendBaseURL") as? String else {
+            throw ImageError.configurationError
+        }
+        
+        let uploadURL = URL(string: "\(baseURL)/api/auth/upload-profile-image")!
+        var request = URLRequest(url: uploadURL)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        guard let imageData = standardizedImageData(from: image) else {
             throw ImageError.compressionFailed
         }
         
-        let hashedUserId = SHA256.hash(data: Data(userId.utf8))
-            .compactMap { String(format: "%02x", $0) }
-            .joined()
+        var body = Data()
+        let lineBreak = "\r\n"
         
-        let filename = "\(hashedUserId).jpg"
-        let imageRef = storage.child("profile_images/\(filename)")
+        body.append("--\(boundary)\(lineBreak)")
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"profile.jpg\"\(lineBreak)")
+        body.append("Content-Type: image/jpeg\(lineBreak)\(lineBreak)")
+        body.append(imageData)
+        body.append("\(lineBreak)")
+        body.append("--\(boundary)--\(lineBreak)")
         
-        let metadata = StorageMetadata()
-        metadata.contentType = "image/jpeg"
+        request.httpBody = body
         
         do {
-            _ = try await imageRef.putDataAsync(imageData, metadata: metadata)
-            let downloadURL = try await imageRef.downloadURL()
+            let (data, response) = try await URLSession.shared.data(for: request)
             
-            try saveImageLocally(normalizedImage, withToken: userId)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw ImageError.invalidResponse
+            }
             
-            return downloadURL.absoluteString
+            print("📥 Status odpowiedzi: \(httpResponse.statusCode)")
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📥 Odpowiedź serwera: \(responseString)")
+            }
+            
+            switch httpResponse.statusCode {
+            case 200...299:
+                if let imageUrl = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                    print("✅ Zdjęcie wysłane pomyślnie")
+                    print("📍 URL zdjęcia: \(imageUrl)\n")
+                    _ = try saveImageLocally(image, withToken: token)
+                    return imageUrl
+                }
+                throw ImageError.invalidResponse
+                
+            case 401:
+                throw ImageError.unauthorized
+                
+            default:
+                if let errorMessage = String(data: data, encoding: .utf8) {
+                    throw ImageError.serverError(errorMessage)
+                }
+                throw ImageError.uploadFailed
+            }
         } catch {
-            print("❌ Upload failed: \(error.localizedDescription)")
+            if error is ImageError {
+                throw error
+            }
             throw ImageError.uploadFailed
+        }
+    }
+    
+    private func appendFormData(_ data: inout Data, string: String) {
+        if let stringData = string.data(using: .utf8) {
+            data.append(stringData)
         }
     }
     
@@ -110,7 +137,7 @@ class ProfileImageManager {
     }
     
     func removeLocalImage(withToken token: String) throws {
-        print(" Attempting to remove local image")
+        print("🗑 Attempting to remove local image")
         let hashedToken = SHA256.hash(data: Data(token.utf8))
             .compactMap { String(format: "%02x", $0) }
             .joined()
@@ -120,46 +147,8 @@ class ProfileImageManager {
         
         if fileManager.fileExists(atPath: fileURL.path) {
             try fileManager.removeItem(at: fileURL)
-            print("🗑️ Removed local image")
-        } else {
-            print(" No local image found to remove")
+            print("✅ Removed local image")
         }
-    }
-    
-    // Compare images using checksum verification
-    func areImagesEqual(localImage: UIImage, remoteImage: UIImage) -> Bool {
-        if !checksumVerificationEnabled {
-            print("🔓 Skipping checksum verification")
-            return true
-        }
-        
-        print("\n📊 Starting image comparison")
-        print("----------------------------")
-        
-        // Generate standardized data for both images
-        guard let localData = standardizedImageData(from: localImage),
-              let remoteData = standardizedImageData(from: remoteImage) else {
-            print("❌ Failed to standardize images for comparison")
-            return false
-        }
-        
-        // Compare file sizes
-        let localFileSize = localData.count
-        let remoteFileSize = remoteData.count
-        print("📏 File sizes:")
-        print("   Local: \(localFileSize) bytes")
-        print("   Remote: \(remoteFileSize) bytes")
-        
-        if localFileSize != remoteFileSize {
-            print("❌ Images have different file sizes after standardization")
-        }
-        
-        // Perform detailed comparison
-        let areEqual = compareImageData(localData, remoteData)
-        print("\n🔍 Final comparison result: \(areEqual ? "✅ Images are equal" : "❌ Images are different")")
-        print("----------------------------\n")
-        
-        return areEqual
     }
     
     // MARK: - Helper Methods
@@ -185,10 +174,49 @@ class ProfileImageManager {
         return data as Data
     }
     
-    enum ImageError: Error {
+    private func verifyResponseFormat(_ response: HTTPURLResponse, data: Data) throws {
+        switch response.statusCode {
+        case 200...299:
+            return
+        case 401:
+            throw ImageError.unauthorized
+        case 413:
+            throw ImageError.fileTooLarge
+        case 415:
+            throw ImageError.unsupportedMediaType
+        default:
+            if let errorMessage = String(data: data, encoding: .utf8) {
+                throw ImageError.serverError(errorMessage)
+            }
+            throw ImageError.uploadFailed
+        }
+    }
+    
+    enum ImageError: Error, LocalizedError {
         case compressionFailed
         case saveFailed
         case loadFailed
         case uploadFailed
+        case invalidResponse
+        case configurationError
+        case unauthorized
+        case fileTooLarge
+        case unsupportedMediaType
+        case serverError(String)
+        
+        var errorDescription: String? {
+            switch self {
+            case .compressionFailed: return "Failed to compress image"
+            case .saveFailed: return "Failed to save image locally"
+            case .loadFailed: return "Failed to load image"
+            case .uploadFailed: return "Failed to upload image"
+            case .invalidResponse: return "Invalid response from server"
+            case .configurationError: return "Missing configuration"
+            case .unauthorized: return "Unauthorized - please log in again"
+            case .fileTooLarge: return "Image file is too large"
+            case .unsupportedMediaType: return "Unsupported image format"
+            case .serverError(let message): return message
+            }
+        }
     }
 }

@@ -29,6 +29,7 @@ enum AuthError: Error {
     case unauthorizedError
     case invalidCredentials
     case notSupported
+    case tokenExpired
 
     /// A description of the error.
     var description: String {
@@ -50,9 +51,10 @@ enum AuthError: Error {
         case .configurationError: return "Configuration error occurred"
         case .presentationError: return "Error presenting authentication view"
         case .invalidCredential: return "Invalid credentials provided"
-        case .unauthorizedError: return "Unauthorized access. Please log in again."
+        case .unauthorizedError: return "Brak autoryzacji. Zaloguj się ponownie."
         case .invalidCredentials: return "Invalid credentials for mock login."
         case .notSupported: return "Operation not supported in this mode."
+        case .tokenExpired: return "Sesja wygasła. Zaloguj się ponownie."
         }
     }
 }

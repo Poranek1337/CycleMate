@@ -50,7 +50,6 @@
 		D0C145AF2DAA94F600674038 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145AE2DAA94F500674038 /* APIService.swift */; };
 		D0C145B12DAAA21000674038 /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145B02DAAA20A00674038 /* AuthResponse.swift */; };
 		D0C145B32DAAD4AB00674038 /* AuthProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145B22DAAD4A900674038 /* AuthProfileService.swift */; };
-		D0C145B52DAAD50600674038 /* GoogleAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C145B42DAAD50400674038 /* GoogleAuthService.swift */; };
 		D0C4CBE42D0DBC070047EAA9 /* AuthUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4CBE32D0DBC070047EAA9 /* AuthUser.swift */; };
 		D0C4CBE72D0DBC780047EAA9 /* AuthenticationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4CBE62D0DBC780047EAA9 /* AuthenticationManager.swift */; };
 		D0C4CBE92D0DBCF00047EAA9 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C4CBE82D0DBCF00047EAA9 /* AuthViewModel.swift */; };
@@ -157,7 +156,6 @@
 		D0C145AE2DAA94F500674038 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		D0C145B02DAAA20A00674038 /* AuthResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthResponse.swift; sourceTree = "<group>"; };
 		D0C145B22DAAD4A900674038 /* AuthProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProfileService.swift; sourceTree = "<group>"; };
-		D0C145B42DAAD50400674038 /* GoogleAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleAuthService.swift; sourceTree = "<group>"; };
 		D0C4CBE32D0DBC070047EAA9 /* AuthUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthUser.swift; sourceTree = "<group>"; };
 		D0C4CBE62D0DBC780047EAA9 /* AuthenticationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationManager.swift; sourceTree = "<group>"; };
 		D0C4CBE82D0DBCF00047EAA9 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
@@ -518,7 +516,6 @@
 			children = (
 				D0750AC62DB45C200025FB4A /* MockAuthenticationService.swift */,
 				D01D2CF12DAD818D00180416 /* UserStorage.swift */,
-				D0C145B42DAAD50400674038 /* GoogleAuthService.swift */,
 				D0C145B22DAAD4A900674038 /* AuthProfileService.swift */,
 				D0C145AE2DAA94F500674038 /* APIService.swift */,
 				D0C145AC2DAA94BC00674038 /* AuthenticationService.swift */,
@@ -813,7 +810,6 @@
 				D0CBC0A32D0A5058007513ED /* OnboardingSlide.swift in Sources */,
 				D01E646D2D907078005EDCDB /* SpeedometerView.swift in Sources */,
 				D0B592FC2C20E3390026D977 /* ContentView.swift in Sources */,
-				D0C145B52DAAD50600674038 /* GoogleAuthService.swift in Sources */,
 				D06BC1CA2D2C3E5F00E504C8 /* EmailLoginView.swift in Sources */,
 				D01D2CEE2DAD814200180416 /* SocialAuthenticationProtocol.swift in Sources */,
 				D0CF02AC2D0F315900D0B15C /* ImagePickerView.swift in Sources */,

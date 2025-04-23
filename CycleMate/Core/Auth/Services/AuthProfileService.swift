@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 import Foundation
 
 class AuthProfileService {
@@ -18,7 +17,7 @@ class AuthProfileService {
             throw AuthError.networkError("Missing base URL configuration")
         }
         
-        let endpoint = "\(baseURL)/api/auth/profile/image"
+        let endpoint = "\(baseURL)/api/auth/upload-profile-image"
         
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             throw AuthError.imageProcessingFailed
@@ -33,25 +32,33 @@ class AuthProfileService {
         
         var body = Data()
         body.append("--\(boundary)\r\n")
-        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n")
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"image.jpg\"\r\n")
         body.append("Content-Type: image/jpeg\r\n\r\n")
         body.append(imageData)
         body.append("\r\n--\(boundary)--\r\n")
         
         request.httpBody = body
         
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            throw AuthError.imageUploadFailed
-        }
-        
-        guard let imageUrl = try? JSONDecoder().decode(String.self, from: data) else {
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                if let errorString = String(data: data, encoding: .utf8) {
+                    print("❌ Server error: \(errorString)")
+                }
+                throw AuthError.imageUploadFailed
+            }
+            
+            if let urlString = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                return urlString
+            }
+            
             throw AuthError.invalidResponse
+        } catch {
+            print("❌ Upload failed with error: \(error)")
+            throw error
         }
-        
-        return imageUrl
     }
     
     func completeUserProfile(userId: String, firstName: String, lastName: String, dateOfBirth: Date, authToken: String?) async throws -> User {

@@ -4,11 +4,23 @@ struct AuthResponse: Codable {
     let userId: Int
     let email: String
     let token: String
+    let firstName: String?
+    let lastName: String?
+    let photoURL: String?
+    let backgroundColor: String?
+    let dateOfBirth: String?
+    let isProfileCompleted: Bool?
     
     enum CodingKeys: String, CodingKey {
-        case userId = "userId"
+        case userId
         case email
         case token
+        case firstName
+        case lastName
+        case photoURL
+        case backgroundColor
+        case dateOfBirth
+        case isProfileCompleted = "profileCompleted"
     }
 }
 
